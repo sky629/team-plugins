@@ -5,6 +5,12 @@
   "allowCrossMarketplaceDependenciesOn": ["claude-plugins-official"],
   "plugins": [
     {
+      "name": "kang-setup",
+      "source": "./kang-setup",
+      "description": "kang 구성 전체(스킬 3 + superpowers + kang-rules)를 한 번에 설치하는 번들",
+      "category": "bundle"
+    },
+    {
       "name": "kang-rules",
       "source": "./kang-rules",
       "description": "kang 의 전역 CLAUDE.md(답변 규율, 문제 해결 원칙, 한국어 작성 지침)를 매 세션 컨텍스트에 넣는 훅",
