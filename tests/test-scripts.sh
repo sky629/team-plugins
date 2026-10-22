@@ -31,6 +31,30 @@ cleanup() {
 # ---- 마켓플레이스 ----
 check validate_strict_passes sh -c 'claude plugin validate --strict . 2>&1 | tail -1 | grep -q "Validation passed"'
 
+# ---- kang-rules/scripts/count-units.sh ----
+check count_units_counts_korean_as_one   test "$(printf '한글\n' | sh kang-rules/scripts/count-units.sh)" = 3
+check count_units_counts_ascii           test "$(printf 'abc' | sh kang-rules/scripts/count-units.sh)" = 3
+check count_units_empty_is_zero          test "$(printf '' | sh kang-rules/scripts/count-units.sh)" = 0
+
+# ---- kang-rules/scripts/print-rules.sh: 정상 ----
+d=$(mktemp -d); printf 'A' > "$d/10-a.md"; printf 'B\n' > "$d/20-b.md"
+out=$(sh kang-rules/scripts/print-rules.sh "$d")
+check print_rules_header_first           test "$(printf '%s\n' "$out" | head -1)" = "# kang 팀 작업 규칙 (team-plugins 의 kang-rules 플러그인이 넣은 지침)"
+check files_are_separated_by_blank_line  test "$(printf '%s\n' "$out" | sed -n '3,5p')" = "$(printf 'A\n\nB')"
+cleanup "$d"
+
+# ---- print-rules.sh: 빈 디렉터리 ----
+d=$(mktemp -d)
+check empty_rules_dir_fails              sh -c "! sh kang-rules/scripts/print-rules.sh '$d' >/dev/null 2>&1"
+check empty_rules_dir_prints_nothing     test -z "$(sh kang-rules/scripts/print-rules.sh "$d" 2>/dev/null)"
+cleanup "$d"
+
+# ---- print-rules.sh: 상한 초과 ----
+d=$(mktemp -d); head -c 10001 /dev/zero | tr '\0' 'a' > "$d/big.md"
+check over_limit_fails                   sh -c "! sh kang-rules/scripts/print-rules.sh '$d' >/dev/null 2>&1"
+check over_limit_prints_nothing          test -z "$(sh kang-rules/scripts/print-rules.sh "$d" 2>/dev/null)"
+cleanup "$d"
+
 # ---- 결과 ----
 if [ "$fails" -ne 0 ]; then
   echo "$fails failed"
