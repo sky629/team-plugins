@@ -40,6 +40,17 @@ check count_units_counts_korean_as_one   test "$(printf '한글\n' | sh kang-rul
 check count_units_counts_ascii           test "$(printf 'abc' | sh kang-rules/scripts/count-units.sh)" = 3
 check count_units_empty_is_zero          test "$(printf '' | sh kang-rules/scripts/count-units.sh)" = 0
 
+# ---- count-units.sh: iconv 가 없거나 실패하면 1 로 끝나고 수를 내지 않는다 (상한 검사가 조용히 꺼지면 안 된다) ----
+d=$(mktemp -d); mkdir "$d/bin"
+for t in sh wc tr mktemp rm cat tail od head sed grep dirname; do ln -s "$(command -v "$t")" "$d/bin/$t"; done
+check count_units_fails_without_iconv    sh -c "! PATH='$d/bin' /bin/sh kang-rules/scripts/count-units.sh </dev/null >/dev/null 2>&1"
+printf '#!/bin/sh\nexit 1\n' > "$d/bin/iconv"; chmod +x "$d/bin/iconv"
+check count_units_fails_when_iconv_fails sh -c "! PATH='$d/bin' /bin/sh kang-rules/scripts/count-units.sh </dev/null >/dev/null 2>&1"
+printf 'A\n' > "$d/10-a.md"
+check print_rules_fails_when_iconv_fails sh -c "! PATH='$d/bin' /bin/sh kang-rules/scripts/print-rules.sh '$d' >/dev/null 2>&1"
+check print_rules_silent_when_iconv_fails test -z "$(PATH="$d/bin" /bin/sh kang-rules/scripts/print-rules.sh "$d" 2>/dev/null)"
+cleanup "$d"
+
 # ---- kang-rules/scripts/print-rules.sh: 정상 ----
 d=$(mktemp -d); printf 'A' > "$d/10-a.md"; printf 'B\n' > "$d/20-b.md"
 out=$(sh kang-rules/scripts/print-rules.sh "$d")
