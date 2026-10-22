@@ -9,11 +9,11 @@ kang 이 쓰는 Claude Code 플러그인과 작업 규칙을 한곳에 모은 �
 | `kang-setup` | 번들 | 아래 플러그인 전부를 한 번에 설치합니다. 자체 기능은 없습니다. | 이 레포 |
 | `kang-rules` | 작업 규칙 | kang 의 전역 CLAUDE.md(답변 규율, 문제 해결 원칙, 한국어 작성 지침)를 매 세션 컨텍스트에 넣는 훅입니다. | 이 레포 [`kang-rules/rules/`](kang-rules/rules/) |
 | `andrej-karpathy-skills` | 스킬 | LLM 코딩 실수를 줄이는 행동 지침 스킬(`karpathy-guidelines`)입니다. | [forrestchang/andrej-karpathy-skills](https://github.com/forrestchang/andrej-karpathy-skills) |
-| `diagram-design` | 스킬 | 브랜드를 적용한 아키텍처·흐름도·차트 다이어그램을 HTML/SVG/PNG 로 만드는 스킬입니다. | [cathrynlavery/diagram-design](https://github.com/cathrynlavery/diagram-design) |
+| `diagram-design` | 스킬 | 브랜드를 적용한 아키텍처·흐름도·차트 다이어그램을 HTML/SVG/PNG 로 만드는 스킬입니다. 스킬이 호출하는 스크립트(node·python) 60여 개가 들어 있습니다. | [cathrynlavery/diagram-design](https://github.com/cathrynlavery/diagram-design) |
 | `eli5` | 스킬 | 주제를 다섯 살에게 설명하듯 그림 설명서로 풀어 주는 스킬입니다. | [anthropics/claude-plugins-community](https://github.com/anthropics/claude-plugins-community/tree/main/eli5) |
 | `superpowers` | 작업 절차 | 브레인스토밍, 계획, TDD, 코드 리뷰 등 개발 절차 스킬 모음입니다. | 공식 마켓플레이스 `claude-plugins-official` (번들 의존성으로 설치) |
 
-스킬 3개는 업스트림 레포를 그대로 참조합니다. 이 레포에는 복사본이 없습니다.
+스킬 3개는 업스트림 레포를 그대로 참조합니다. 이 레포에는 복사본이 없습니다. `andrej-karpathy-skills` 와 `eli5` 는 마크다운만 있습니다. `diagram-design` 은 스킬이 실행하는 스크립트를 포함하므로, 업데이트하면 그 스크립트도 새 버전으로 바뀝니다. kang 이 같은 조건으로 쓰고 있어서 커밋을 고정하지 않기로 했습니다.
 
 ## 전체 설치
 
@@ -83,7 +83,7 @@ claude plugin uninstall diagram-design@diagram-design
 
 ### 플러그인 추가
 
-1. 코드가 실행되는 플러그인(UI mod, 훅, MCP 서버)이면 소스를 감사합니다. 스킬만 있는 플러그인은 업스트림 추종을 허용합니다.
+1. 세션이 자동으로 실행하는 코드(UI mod, 훅, MCP 서버)가 든 플러그인이면 소스를 감사하고 `sha` 로 고정합니다. 마크다운만 있는 스킬 플러그인은 업스트림 추종을 허용합니다. 스킬이 호출하는 스크립트가 든 플러그인(diagram-design 처럼)은 추종을 허용하되, 위 표에 그 사실을 적습니다.
 2. `.claude-plugin/marketplace.json` 에 항목을 추가합니다. 소스는 `https://` URL 을 쓴 `url` 또는 `git-subdir` 타입으로 적습니다. 코드가 실행되는 플러그인은 `sha` 를 40자 전체 해시로 고정합니다.
 3. 번들에 넣으려면 `kang-setup/.claude-plugin/plugin.json` 의 `dependencies` 에도 추가합니다.
 4. `claude plugin validate .` 를 실행합니다. 마지막 줄이 `Validation passed` 여야 합니다. 경고는 `No version specified` 두 줄만 허용합니다(`kang-setup`, `kang-rules` 는 설계상 `version` 을 두지 않습니다).
