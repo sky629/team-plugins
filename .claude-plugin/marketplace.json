@@ -1,0 +1,36 @@
+{
+  "name": "team-plugins",
+  "description": "kang 이 쓰는 Claude Code 플러그인과 작업 규칙 모음. 골라서 설치하거나 kang-setup 으로 한 번에 설치한다.",
+  "owner": { "name": "sky629", "url": "https://github.com/sky629" },
+  "allowCrossMarketplaceDependenciesOn": ["claude-plugins-official"],
+  "plugins": [
+    {
+      "name": "andrej-karpathy-skills",
+      "source": {
+        "source": "url",
+        "url": "https://github.com/forrestchang/andrej-karpathy-skills.git"
+      },
+      "description": "LLM 코딩 실수를 줄이는 행동 지침 스킬 (karpathy-guidelines)",
+      "category": "skill"
+    },
+    {
+      "name": "diagram-design",
+      "source": {
+        "source": "url",
+        "url": "https://github.com/cathrynlavery/diagram-design.git"
+      },
+      "description": "브랜드 적용 아키텍처·흐름도·차트 다이어그램을 HTML/SVG/PNG 로 만드는 스킬",
+      "category": "skill"
+    },
+    {
+      "name": "eli5",
+      "source": {
+        "source": "git-subdir",
+        "url": "https://github.com/anthropics/claude-plugins-community.git",
+        "path": "eli5"
+      },
+      "description": "주제를 다섯 살에게 설명하듯 그림 설명서로 풀어 주는 스킬",
+      "category": "skill"
+    }
+  ]
+}
