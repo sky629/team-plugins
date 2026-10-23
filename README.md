@@ -71,45 +71,6 @@ claude plugin disable kang-setup@team-plugins && claude plugin disable kang-rule
 claude plugin uninstall diagram-design@diagram-design
 ```
 
-## 운영 (kang 용)
-
-### 규칙 글 갱신
-
-1. `~/.claude/CLAUDE.md` 또는 `~/.claude/KOREAN.md` 를 고칩니다.
-2. 레포 루트에서 `sh scripts/sync-rules.sh` 를 실행합니다. 마지막 줄 `rules: N / 10000` 이 상한 안이면 `kang-rules/rules/` 가 갱신됩니다. 상한을 넘으면 실패하고 레포는 그대로입니다.
-3. 커밋하고 푸시합니다. 팀원은 업데이트로 받습니다.
-
-`kang-rules/rules/` 는 손으로 고치지 않습니다. 이 스크립트로만 갱신합니다.
-
-### 플러그인 추가
-
-1. 세션이 자동으로 실행하는 코드(UI mod, 훅, MCP 서버)가 든 플러그인이면 소스를 감사하고 `sha` 로 고정합니다. 마크다운만 있는 스킬 플러그인은 업스트림 추종을 허용합니다. 스킬이 호출하는 스크립트가 든 플러그인(diagram-design 처럼)은 추종을 허용하되, 위 표에 그 사실을 적습니다.
-2. `.claude-plugin/marketplace.json` 에 항목을 추가합니다. 소스는 `https://` URL 을 쓴 `url` 또는 `git-subdir` 타입으로 적습니다. 코드가 실행되는 플러그인은 `sha` 를 40자 전체 해시로 고정합니다.
-3. 번들에 넣으려면 `kang-setup/.claude-plugin/plugin.json` 의 `dependencies` 에도 추가합니다.
-4. `claude plugin validate .` 를 실행합니다. 마지막 줄이 `Validation passed` 여야 합니다. 경고는 `No version specified` 두 줄만 허용합니다(`kang-setup`, `kang-rules` 는 설계상 `version` 을 두지 않습니다).
-5. `sh tests/test-scripts.sh` 와 `sh tests/install-smoke.sh .` 를 실행합니다.
-6. 커밋하고 푸시합니다.
-
-### 플러그인 제거
-
-항목을 지우고, 최상위 `renames` 에 `"<이름>": null` 을 추가합니다. `renames` 는 지우지 않고 쌓기만 합니다. `forceRemoveDeletedPlugins` 는 쓰지 않습니다. 항목 `name` 은 바꾸지 않습니다. 표시 이름을 바꾸려면 `displayName` 을 씁니다.
-
-### 지우면 안 되는 것
-
-`allowCrossMarketplaceDependenciesOn` 을 지우면 번들이 superpowers 없이 "성공" 으로 설치되고 로드에 실패합니다. 실측한 결과는 다음과 같습니다.
-
-```
-✔ Successfully installed plugin: kang-setup@team-plugins (scope: user) (+ 4 dependencies: kang-rules, andrej-karpathy-skills, diagram-design, eli5)
-❯ kang-setup@team-plugins
-  Status: ✘ failed to load
-  Error: Dependency "superpowers@claude-plugins-official" is not installed — run `claude plugin install superpowers@claude-plugins-official`, or check that its marketplace is added
-```
-
-### 검증 스크립트
-
-- `sh tests/test-scripts.sh`: 스크립트 단위 테스트와 카탈로그 검증.
-- `sh tests/install-smoke.sh .`: 격리된 설정 디렉터리에서 번들 설치를 끝까지 해 봅니다. `sky629/team-plugins --block-ssh` 를 주면 SSH 를 막은 채 GitHub 에서 설치해 봅니다.
-
 ## 라이선스
 
 MIT
