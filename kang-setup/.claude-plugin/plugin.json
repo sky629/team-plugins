@@ -1,12 +1,13 @@
 {
   "name": "kang-setup",
-  "description": "kang 구성 전체: andrej-karpathy-skills, diagram-design, eli5, superpowers, kang-rules",
+  "description": "kang 구성 전체: andrej-karpathy-skills, diagram-design, eli5, superpowers, context7, kang-rules",
   "author": { "name": "sky629", "url": "https://github.com/sky629" },
   "dependencies": [
     "kang-rules",
     "andrej-karpathy-skills",
     "diagram-design",
     "eli5",
-    "superpowers@claude-plugins-official"
+    "superpowers@claude-plugins-official",
+    "context7@claude-plugins-official"
   ]
 }

@@ -12,6 +12,7 @@ kang 이 쓰는 Claude Code 플러그인과 작업 규칙을 한곳에 모은 �
 | `diagram-design` | 스킬 | 브랜드를 적용한 아키텍처·흐름도·차트 다이어그램을 HTML/SVG/PNG 로 만드는 스킬입니다. 스킬이 호출하는 스크립트(node·python) 60여 개가 들어 있습니다. | [cathrynlavery/diagram-design](https://github.com/cathrynlavery/diagram-design) |
 | `eli5` | 스킬 | 주제를 다섯 살에게 설명하듯 그림 설명서로 풀어 주는 스킬입니다. | [anthropics/claude-plugins-community](https://github.com/anthropics/claude-plugins-community/tree/main/eli5) |
 | `superpowers` | 작업 절차 | 브레인스토밍, 계획, TDD, 코드 리뷰 등 개발 절차 스킬 모음입니다. | 공식 마켓플레이스 `claude-plugins-official` (번들 의존성으로 설치) |
+| `context7` | MCP 서버 | 라이브러리·프레임워크의 최신 공식 문서를 조회하는 MCP 서버입니다. | 공식 마켓플레이스 `claude-plugins-official` (번들 의존성으로 설치) |
 
 스킬 3개는 업스트림 레포를 그대로 참조합니다. 이 레포에는 복사본이 없습니다. `andrej-karpathy-skills` 와 `eli5` 는 마크다운만 있습니다. `diagram-design` 은 스킬이 실행하는 스크립트를 포함하므로, 업데이트하면 그 스크립트도 새 버전으로 바뀝니다. kang 이 같은 조건으로 쓰고 있어서 커밋을 고정하지 않기로 했습니다.
 
@@ -26,9 +27,9 @@ Claude Code 세션 안에서 두 줄을 실행합니다.
 
 설치가 끝나면 `/reload-plugins` 를 실행하거나 세션을 다시 시작합니다. GitHub SSH 키는 필요 없습니다. SSH 가 안 되면 HTTPS 로 넘어갑니다. 축약형 대신 `https://github.com/sky629/team-plugins.git` 을 써도 같은 마켓플레이스가 등록됩니다.
 
-superpowers 는 공식 마켓플레이스에서 함께 설치됩니다. 설치 결과에 `superpowers@claude-plugins-official was not installed` 가 보이면 공식 마켓플레이스가 아직 등록되지 않은 것이므로, `/plugin marketplace add anthropics/claude-plugins-official` 을 실행한 뒤 다시 설치합니다.
+superpowers 와 context7 은 공식 마켓플레이스에서 함께 설치됩니다. 설치 결과에 `superpowers@claude-plugins-official was not installed` 가 보이면 공식 마켓플레이스가 아직 등록되지 않은 것이므로, `/plugin marketplace add anthropics/claude-plugins-official` 을 실행한 뒤 다시 설치합니다.
 
-쉘에서 설치하려면 다음 순서로 실행합니다. 새 머신에서는 공식 마켓플레이스를 먼저 등록해야 superpowers 가 설치됩니다.
+쉘에서 설치하려면 다음 순서로 실행합니다. 새 머신에서는 공식 마켓플레이스를 먼저 등록해야 superpowers 와 context7 이 설치됩니다.
 
 ```sh
 claude plugin marketplace add anthropics/claude-plugins-official
@@ -61,7 +62,7 @@ claude plugin disable kang-setup@team-plugins && claude plugin disable kang-rule
 - **수동**: `/plugin marketplace update team-plugins` 를 실행한 뒤 `claude plugin update <이름>@team-plugins` 를 실행하고, `/reload-plugins` 로 적용합니다. 번들에 새 플러그인이 추가됐으면 `claude plugin update kang-setup@team-plugins` 뒤 `/reload-plugins` 가 새 의존성을 설치합니다.
 - **자동**: `/plugin` → Marketplaces → team-plugins → Enable auto-update 를 켭니다. 기본값은 꺼짐입니다.
 - **버전 규칙**: `kang-setup` 과 `kang-rules` 는 이 레포의 커밋이 곧 새 버전입니다. 스킬 3개는 업스트림이 `version` 을 올릴 때 따라갑니다.
-- **번들 제거**: `claude plugin uninstall kang-setup@team-plugins` 를 실행해도 의존성 플러그인은 남습니다. 의존성까지 전부 지우려면 `claude plugin prune` 을 실행합니다. 이 명령은 자동 설치된 플러그인 5개(superpowers 포함)를 모두 지우므로, `--dry-run` 으로 먼저 확인합니다.
+- **번들 제거**: `claude plugin uninstall kang-setup@team-plugins` 를 실행해도 의존성 플러그인은 남습니다. 의존성까지 전부 지우려면 `claude plugin prune` 을 실행합니다. 이 명령은 자동 설치된 플러그인 6개(superpowers, context7 포함)를 모두 지우므로, `--dry-run` 으로 먼저 확인합니다.
 
 ## 이미 설치한 사람
 
