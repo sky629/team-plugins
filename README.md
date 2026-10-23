@@ -65,7 +65,7 @@ claude plugin disable kang-setup@team-plugins && claude plugin disable kang-rule
 
 ## 이미 설치한 사람
 
-`karpathy-skills`, `diagram-design`, `claude-community` 마켓플레이스에서 같은 플러그인을 이미 설치했다면, team-plugins 에서 설치하기 전에 기존 것을 제거합니다. 같은 이름의 플러그인이 두 마켓플레이스에서 동시에 켜져 있으면 한쪽 훅만 동작합니다.
+다른 마켓플레이스(`karpathy-skills`, `diagram-design`, `claude-community`)에서 같은 플러그인을 이미 설치했어도 그대로 두고 설치해도 됩니다. 두 개가 나란히 켜지고 스킬이 목록에 두 번 보일 뿐, 오류는 없습니다(실측: 두 플러그인의 스킬이 모두 로드되고 충돌 없음). 하나만 두고 싶으면 옛것을 지웁니다.
 
 ```sh
 claude plugin uninstall diagram-design@diagram-design
