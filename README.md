@@ -13,8 +13,9 @@ kang 이 쓰는 Claude Code 플러그인과 작업 규칙을 한곳에 모은 �
 | `eli5` | 스킬 | 주제를 다섯 살에게 설명하듯 그림 설명서로 풀어 주는 스킬입니다. | [anthropics/claude-plugins-community](https://github.com/anthropics/claude-plugins-community/tree/main/eli5) |
 | `superpowers` | 작업 절차 | 브레인스토밍, 계획, TDD, 코드 리뷰 등 개발 절차 스킬 모음입니다. | 공식 마켓플레이스 `claude-plugins-official` (번들 의존성으로 설치) |
 | `context7` | MCP 서버 | 라이브러리·프레임워크의 최신 공식 문서를 조회하는 MCP 서버입니다. | 공식 마켓플레이스 `claude-plugins-official` (번들 의존성으로 설치) |
+| `pstack` | 작업 절차 | 설계·구현·검증·리뷰를 서브에이전트로 병렬화하는 엄격한 워크플로 스킬 모음(`poteto-mode`, `how`, `why`, `arena` 등)입니다. 스킬이 호출하는 스크립트(sh·node)가 들어 있습니다. 설치 뒤 `/setup-pstack` 으로 역할별 모델을 정할 수 있습니다. | [cursor/plugins](https://github.com/cursor/plugins/tree/main/harness/pstack/claude-code) |
 
-스킬 3개는 업스트림 레포를 그대로 참조합니다. 이 레포에는 복사본이 없습니다. `andrej-karpathy-skills` 와 `eli5` 는 마크다운만 있습니다. `diagram-design` 은 스킬이 실행하는 스크립트를 포함하므로, 업데이트하면 그 스크립트도 새 버전으로 바뀝니다. kang 이 같은 조건으로 쓰고 있어서 커밋을 고정하지 않기로 했습니다.
+스킬 플러그인 4개(`andrej-karpathy-skills`, `diagram-design`, `eli5`, `pstack`)는 업스트림 레포를 그대로 참조합니다. 이 레포에는 복사본이 없습니다. `andrej-karpathy-skills` 와 `eli5` 는 마크다운만 있습니다. `diagram-design` 과 `pstack` 은 스킬이 실행하는 스크립트를 포함하므로, 업데이트하면 그 스크립트도 새 버전으로 바뀝니다. kang 이 같은 조건으로 쓰고 있어서 커밋을 고정하지 않기로 했습니다.
 
 ## 전체 설치
 
@@ -61,12 +62,12 @@ claude plugin disable kang-setup@team-plugins && claude plugin disable kang-rule
 
 - **수동**: `/plugin marketplace update team-plugins` 를 실행한 뒤 `claude plugin update <이름>@team-plugins` 를 실행하고, `/reload-plugins` 로 적용합니다. 번들에 새 플러그인이 추가됐으면 `claude plugin update kang-setup@team-plugins` 뒤 `/reload-plugins` 가 새 의존성을 설치합니다.
 - **자동**: `/plugin` → Marketplaces → team-plugins → Enable auto-update 를 켭니다. 기본값은 꺼짐입니다.
-- **버전 규칙**: `kang-setup` 과 `kang-rules` 는 이 레포의 커밋이 곧 새 버전입니다. 스킬 3개는 업스트림이 `version` 을 올릴 때 따라갑니다.
-- **번들 제거**: `claude plugin uninstall kang-setup@team-plugins` 를 실행해도 의존성 플러그인은 남습니다. 의존성까지 전부 지우려면 `claude plugin prune` 을 실행합니다. 이 명령은 자동 설치된 플러그인 6개(superpowers, context7 포함)를 모두 지우므로, `--dry-run` 으로 먼저 확인합니다.
+- **버전 규칙**: `kang-setup` 과 `kang-rules` 는 이 레포의 커밋이 곧 새 버전입니다. 스킬 플러그인 4개는 업스트림이 `version` 을 올릴 때 따라갑니다.
+- **번들 제거**: `claude plugin uninstall kang-setup@team-plugins` 를 실행해도 의존성 플러그인은 남습니다. 의존성까지 전부 지우려면 `claude plugin prune` 을 실행합니다. 이 명령은 자동 설치된 플러그인 7개(superpowers, context7, pstack 포함)를 모두 지우므로, `--dry-run` 으로 먼저 확인합니다.
 
 ## 이미 설치한 사람
 
-다른 마켓플레이스(`karpathy-skills`, `diagram-design`, `claude-community`)에서 같은 플러그인을 이미 설치했어도 그대로 두고 설치해도 됩니다. 두 개가 나란히 켜지고 스킬이 목록에 두 번 보일 뿐, 오류는 없습니다(실측: 두 플러그인의 스킬이 모두 로드되고 충돌 없음). 하나만 두고 싶으면 옛것을 지웁니다.
+다른 마켓플레이스(`karpathy-skills`, `diagram-design`, `claude-community`, `cursor-plugins`)에서 같은 플러그인을 이미 설치했어도 그대로 두고 설치해도 됩니다. 두 개가 나란히 켜지고 스킬이 목록에 두 번 보일 뿐, 오류는 없습니다(실측: 두 플러그인의 스킬이 모두 로드되고 충돌 없음). 하나만 두고 싶으면 옛것을 지웁니다.
 
 ```sh
 claude plugin uninstall diagram-design@diagram-design

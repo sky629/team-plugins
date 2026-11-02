@@ -7,7 +7,7 @@
     {
       "name": "kang-setup",
       "source": "./kang-setup",
-      "description": "kang 구성 전체(스킬 3 + superpowers + context7 + kang-rules)를 한 번에 설치하는 번들",
+      "description": "kang 구성 전체(스킬 3 + pstack + superpowers + context7 + kang-rules)를 한 번에 설치하는 번들",
       "category": "bundle"
     },
     {
@@ -42,6 +42,16 @@
         "path": "eli5"
       },
       "description": "주제를 다섯 살에게 설명하듯 그림 설명서로 풀어 주는 스킬",
+      "category": "skill"
+    },
+    {
+      "name": "pstack",
+      "source": {
+        "source": "git-subdir",
+        "url": "https://github.com/cursor/plugins.git",
+        "path": "harness/pstack/claude-code"
+      },
+      "description": "설계·구현·검증·리뷰를 서브에이전트로 병렬화하는 엄격한 워크플로 스킬 모음 (poteto-mode, how, why, arena)",
       "category": "skill"
     }
   ]
