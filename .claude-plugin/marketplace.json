@@ -7,7 +7,7 @@
     {
       "name": "kang-setup",
       "source": "./kang-setup",
-      "description": "kang 구성 전체(스킬 3 + pstack + superpowers + context7 + kang-rules)를 한 번에 설치하는 번들",
+      "description": "kang 구성 전체(스킬 3 + pstack + superpowers + context7 + kang-rules + compact-handoff)를 한 번에 설치하는 번들",
       "category": "bundle"
     },
     {
@@ -15,6 +15,12 @@
       "source": "./kang-rules",
       "description": "kang 의 전역 CLAUDE.md(답변 규율, 문제 해결 원칙, 한국어 작성 지침)를 매 세션 컨텍스트에 넣는 훅",
       "category": "rules"
+    },
+    {
+      "name": "compact-handoff",
+      "source": "./compact-handoff",
+      "description": "자동 압축 직전에 세션 기록을 핸드오프 문서로 저장하고, 압축 뒤 컨텍스트에 넣은 다음 지우는 훅",
+      "category": "hook"
     },
     {
       "name": "andrej-karpathy-skills",

@@ -13,6 +13,7 @@ kang 이 쓰는 Claude Code 플러그인과 작업 규칙을 한곳에 모은 �
 | `eli5` | 스킬 | 주제를 다섯 살에게 설명하듯 그림 설명서로 풀어 주는 스킬입니다. | [anthropics/claude-plugins-community](https://github.com/anthropics/claude-plugins-community/tree/main/eli5) |
 | `superpowers` | 작업 절차 | 브레인스토밍, 계획, TDD, 코드 리뷰 등 개발 절차 스킬 모음입니다. | 공식 마켓플레이스 `claude-plugins-official` (번들 의존성으로 설치) |
 | `context7` | MCP 서버 | 라이브러리·프레임워크의 최신 공식 문서를 조회하는 MCP 서버입니다. | 공식 마켓플레이스 `claude-plugins-official` (번들 의존성으로 설치) |
+| `compact-handoff` | 훅 | 자동 압축 직전에 세션 기록(최근 요청·고친 파일·git 상태)을 핸드오프 문서로 저장하고, 압축 뒤 컨텍스트에 넣은 다음 지우는 훅입니다. python3 가 필요합니다. | 이 레포 [`compact-handoff/`](compact-handoff/) |
 | `pstack` | 작업 절차 | 설계·구현·검증·리뷰를 서브에이전트로 병렬화하는 엄격한 워크플로 스킬 모음(`poteto-mode`, `how`, `why`, `arena` 등)입니다. 스킬이 호출하는 스크립트(sh·node)가 들어 있습니다. 설치 뒤 `/setup-pstack` 으로 역할별 모델을 정할 수 있습니다. | [cursor/plugins](https://github.com/cursor/plugins/tree/main/harness/pstack/claude-code) |
 
 스킬 플러그인 4개(`andrej-karpathy-skills`, `diagram-design`, `eli5`, `pstack`)는 업스트림 레포를 그대로 참조합니다. 이 레포에는 복사본이 없습니다. `andrej-karpathy-skills` 와 `eli5` 는 마크다운만 있습니다. `diagram-design` 과 `pstack` 은 스킬이 실행하는 스크립트를 포함하므로, 업데이트하면 그 스크립트도 새 버전으로 바뀝니다. kang 이 같은 조건으로 쓰고 있어서 커밋을 고정하지 않기로 했습니다.
@@ -58,12 +59,33 @@ claude plugin disable kang-setup@team-plugins && claude plugin disable kang-rule
 
 번들은 자체 기능이 없어서 꺼도 잃는 것이 없고, 나머지 플러그인은 그대로 켜져 있습니다. 다시 켜려면 `claude plugin enable kang-rules@team-plugins` 를 실행합니다.
 
+## compact-handoff 가 하는 일과 70% 임계값
+
+자동 압축 요약은 최근 요청과 고친 파일을 빠뜨리기 쉽습니다. `compact-handoff` 는 그 사실을 트랜스크립트에서 기계적으로 뽑아 보완합니다.
+
+1. 압축 직전(`PreCompact`)에 [`handoff-write.sh`](compact-handoff/scripts/handoff-write.sh) 가 `~/.claude/handoff/<session_id>.md` 를 씁니다. 작업 디렉터리와 git 상태, 최근 사용자 요청 12개, 최근 Bash 작업 설명 10개, 이 세션에서 고친 파일 목록, 마지막 답변 앞부분이 들어갑니다. 7일 지난 핸드오프 파일은 이때 지웁니다.
+2. 압축 뒤 세션이 다시 시작될 때(`SessionStart`, matcher `compact`) [`handoff-read.sh`](compact-handoff/scripts/handoff-read.sh) 가 그 문서를 `<handoff>` 블록으로 컨텍스트에 넣고 파일을 지웁니다. 문서가 없으면 아무것도 하지 않습니다.
+
+두 스크립트는 bash 와 python3 를 씁니다. 압축 없이 끝난 세션의 문서는 다음 압축 때 7일 기준으로 정리됩니다.
+
+압축 임계값은 플러그인이 바꿀 수 없습니다. 70% 에서 압축되게 하려면 `~/.claude/settings.json` 의 `env` 에 다음 값을 넣습니다. 환경 변수이므로 새로 시작하는 세션부터 적용됩니다.
+
+```json
+{ "env": { "CLAUDE_AUTOCOMPACT_PCT_OVERRIDE": "70" } }
+```
+
+`compact-handoff` 도 `kang-setup` 의 의존성이라서 혼자 끌 수 없습니다. 끄려면 `kang-rules` 와 같은 방법으로 번들과 함께 끕니다.
+
+```sh
+claude plugin disable kang-setup@team-plugins && claude plugin disable compact-handoff@team-plugins
+```
+
 ## 업데이트
 
 - **수동**: `/plugin marketplace update team-plugins` 를 실행한 뒤 `claude plugin update <이름>@team-plugins` 를 실행하고, `/reload-plugins` 로 적용합니다. 번들에 새 플러그인이 추가됐으면 `claude plugin update kang-setup@team-plugins` 뒤 `/reload-plugins` 가 새 의존성을 설치합니다.
 - **자동**: `/plugin` → Marketplaces → team-plugins → Enable auto-update 를 켭니다. 기본값은 꺼짐입니다.
-- **버전 규칙**: `kang-setup` 과 `kang-rules` 는 이 레포의 커밋이 곧 새 버전입니다. 스킬 플러그인 4개는 업스트림이 `version` 을 올릴 때 따라갑니다.
-- **번들 제거**: `claude plugin uninstall kang-setup@team-plugins` 를 실행해도 의존성 플러그인은 남습니다. 의존성까지 전부 지우려면 `claude plugin prune` 을 실행합니다. 이 명령은 자동 설치된 플러그인 7개(superpowers, context7, pstack 포함)를 모두 지우므로, `--dry-run` 으로 먼저 확인합니다.
+- **버전 규칙**: `kang-setup`, `kang-rules`, `compact-handoff` 는 이 레포의 커밋이 곧 새 버전입니다. 스킬 플러그인 4개는 업스트림이 `version` 을 올릴 때 따라갑니다.
+- **번들 제거**: `claude plugin uninstall kang-setup@team-plugins` 를 실행해도 의존성 플러그인은 남습니다. 의존성까지 전부 지우려면 `claude plugin prune` 을 실행합니다. 이 명령은 자동 설치된 플러그인 8개(superpowers, context7, pstack, compact-handoff 포함)를 모두 지우므로, `--dry-run` 으로 먼저 확인합니다.
 
 ## 이미 설치한 사람
 

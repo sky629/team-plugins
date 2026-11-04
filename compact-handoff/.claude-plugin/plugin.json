@@ -1,0 +1,8 @@
+{
+  "name": "compact-handoff",
+  "description": "자동 압축 직전에 세션 기록(최근 요청·고친 파일·git 상태)을 핸드오프 문서로 저장하고, 압축 뒤 컨텍스트에 넣은 다음 지운다",
+  "author": {
+    "name": "sky629",
+    "url": "https://github.com/sky629"
+  }
+}

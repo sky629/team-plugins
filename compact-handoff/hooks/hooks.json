@@ -1,0 +1,29 @@
+{
+  "hooks": {
+    "PreCompact": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/scripts/handoff-write.sh\"",
+            "timeout": 20,
+            "statusMessage": "압축 전 핸드오프 문서 작성"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "matcher": "compact",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/scripts/handoff-read.sh\"",
+            "timeout": 10,
+            "statusMessage": "핸드오프 문서 주입"
+          }
+        ]
+      }
+    ]
+  }
+}
