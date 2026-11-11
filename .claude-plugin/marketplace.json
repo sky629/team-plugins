@@ -59,6 +59,18 @@
       },
       "description": "설계·구현·검증·리뷰를 서브에이전트로 병렬화하는 엄격한 워크플로 스킬 모음 (poteto-mode, how, why, arena)",
       "category": "skill"
+    },
+    {
+      "name": "make-notion",
+      "source": "./make-notion",
+      "description": "git 브랜치 작업을 비개발자용 설계 공유 문서로 정리해 노션에 올리는 스킬 (make_notion)",
+      "category": "skill"
+    },
+    {
+      "name": "review-pr",
+      "source": "./review-pr",
+      "description": "GitHub PR 을 5축으로 검토하고 재현한 문제만 보고서와 코멘트 초안으로 내는 스킬 (review-pr)",
+      "category": "skill"
     }
   ]
 }

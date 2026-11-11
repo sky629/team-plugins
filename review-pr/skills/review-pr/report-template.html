@@ -1,0 +1,358 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PR #NNNN <주제> 리뷰</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* 레이아웃: 한 열 문서. 판정 상자 → 카운트 타일 → 8절. 항목은 chip + where + 재현 + 제안 + 제안 근거 상자 고정. 이 CSS 는 바꾸지 않는다. */
+:root{
+  --bg:#f7f7f5; --panel:#ffffff; --fg:#1d2126; --muted:#5d6670; --line:#d9dcd6;
+  --accent:#1f5f8b; --accent-soft:#e3eef6;
+  --ok:#2b7a4b; --ok-soft:#e4f2e9; --warn:#9a6700; --warn-soft:#fbf1dc; --crit:#a63a2a; --crit-soft:#f8e5e1;
+  --code-bg:#eef0ec;
+  --sans:"IBM Plex Sans KR",-apple-system,"Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#15181c; --panel:#1d2126; --fg:#e6e8e3; --muted:#9aa3ab; --line:#333a42;
+  --accent:#7fb6dc; --accent-soft:#1d3346;
+  --ok:#7ccf9a; --ok-soft:#1c3326; --warn:#e5b65a; --warn-soft:#3a2f14; --crit:#ef8f7e; --crit-soft:#41211b;
+  --code-bg:#262b31; color-scheme:dark } }
+:root[data-theme="dark"]{
+  --bg:#15181c; --panel:#1d2126; --fg:#e6e8e3; --muted:#9aa3ab; --line:#333a42;
+  --accent:#7fb6dc; --accent-soft:#1d3346;
+  --ok:#7ccf9a; --ok-soft:#1c3326; --warn:#e5b65a; --warn-soft:#3a2f14; --crit:#ef8f7e; --crit-soft:#41211b;
+  --code-bg:#262b31; color-scheme:dark }
+body{background:var(--bg);color:var(--fg);font-family:var(--sans);line-height:1.6;font-size:15px;margin:0;
+  padding-block:32px 64px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+main{max-width:980px;margin:0 auto;display:grid;gap:28px}
+h1{font-size:26px;line-height:1.3;margin:0 0 4px;text-wrap:balance;font-weight:700}
+h2{font-size:19px;margin:0 0 12px;padding-top:4px;border-top:2px solid var(--line);padding-top:14px;font-weight:600}
+h3{font-size:15.5px;margin:0;font-weight:600}
+p{margin:0}
+.sub{color:var(--muted);font-size:13.5px}
+code,pre{font-family:var(--mono);font-size:13px}
+code{background:var(--code-bg);padding:1px 5px;border-radius:4px}
+pre{background:var(--code-bg);padding:12px 14px;border-radius:6px;overflow-x:auto;margin:0;line-height:1.5}
+pre code{background:none;padding:0}
+.verdict{border:1px solid var(--line);border-left:6px solid var(--ok);background:var(--panel);padding:18px 20px;border-radius:8px;display:grid;gap:8px}
+.verdict.fix{border-left-color:var(--crit)} .verdict.structure{border-left-color:var(--warn)}
+.verdict .big{font-size:20px;font-weight:700;color:var(--ok)}
+.verdict.fix .big{color:var(--crit)} .verdict.structure .big{color:var(--warn)}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(112px,1fr));gap:10px}
+.tile{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:10px 12px;display:grid;gap:2px}
+.tile .n{font-size:22px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.1}
+.tile .l{font-size:12px;color:var(--muted);letter-spacing:.02em}
+.item{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:14px 16px;display:grid;gap:8px}
+.items{display:grid;gap:12px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.chip{font-size:11.5px;letter-spacing:.03em;padding:2px 8px;border-radius:999px;border:1px solid var(--line);color:var(--muted);background:var(--bg)}
+.chip.crit{background:var(--crit);color:#fff;border-color:transparent}
+.chip.major{background:var(--crit-soft);color:var(--crit);border-color:transparent}
+.chip.minor{background:var(--warn-soft);color:var(--warn);border-color:transparent}
+.chip.dup,.chip.arch,.chip.cause{background:var(--accent-soft);color:var(--accent);border-color:transparent}
+.chip.obs{background:var(--bg)}
+.chip.kept{background:var(--ok-soft);color:var(--ok);border-color:transparent}
+.chip.decided{background:var(--bg);border-style:dashed}
+section h3.t{margin:16px 0 8px;font-size:14px;color:var(--muted);font-weight:600}
+.chip.how{font-family:var(--mono);font-size:11px}
+.row{display:grid;grid-template-columns:72px minmax(0,1fr);gap:10px;font-size:14px}
+.row .k{color:var(--muted);font-size:12.5px;padding-top:2px}
+.row .v{min-width:0}
+details.why{border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:6px;padding:8px 14px 12px;background:var(--bg);font-size:14px}
+details.why summary{cursor:pointer;color:var(--accent);font-weight:600;font-size:13.5px;padding:2px 0}
+details.why[open] summary{margin-bottom:6px;padding-bottom:8px;border-bottom:1px solid var(--line)}
+details.why .row{grid-template-columns:84px minmax(0,1fr);margin-top:10px}
+details.why .row .k{color:var(--fg);font-weight:600}
+details.why ul{display:grid;gap:5px;padding-left:18px}
+details.why .pick{font-weight:600;color:var(--ok)} details.why .drop{font-weight:600;color:var(--muted)}
+table{border-collapse:collapse;width:100%;font-size:13.5px}
+th,td{text-align:left;padding:7px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{color:var(--muted);font-weight:500;font-size:12.5px}
+td.num{font-variant-numeric:tabular-nums}
+.tablewrap{overflow-x:auto}
+figure{margin:0;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:14px}
+figure svg{max-width:100%;height:auto;display:block;color:var(--fg)}
+figcaption{font-size:13px;color:var(--muted);margin-top:8px}
+.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px}
+.compare{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:10px;margin:2px 0 6px}
+.compare figure{margin:0;padding:0;border:1px solid var(--line);border-radius:6px;background:var(--code-bg);overflow:hidden}
+.compare figcaption{margin:0;padding:6px 10px;font-size:12px;color:var(--muted);background:var(--panel);border-bottom:1px solid var(--line)}
+.compare figcaption b{color:var(--fg);font-weight:600}
+.compare pre{background:transparent;border-radius:0;padding:10px 12px;overflow:auto;white-space:pre-wrap;word-break:break-word}
+.compare mark{background:var(--warn-soft);color:inherit;border-radius:2px;padding:0 1px}
+.measure{font-size:13px;color:var(--muted)}
+.two>div{min-width:0}
+.ok{color:var(--ok)} .warn{color:var(--warn)}
+ul{margin:0;padding-left:20px}
+li{margin:2px 0}
+@media (max-width:480px){ .row{grid-template-columns:1fr} h1{font-size:22px} }
+</style>
+</head>
+<body>
+<!--
+  review-pr 보고서 템플릿. Artifact 환경과 Artifact 없는 환경이 같은 파일을 만든다. 다른 점은 발행 URL 유무뿐이다.
+  채우는 규칙:
+  - 절 순서·절 제목·CSS 를 바꾸지 않는다. 비는 절은 지우지 않고 "없음" 한 줄을 둔다.
+  - 항목(article.item)은 chip 행 → h3 → where → 재현 또는 대조 → 제안 → details.why(결정 기록 5항) 순서다. details.why 안의 대안·적합성은 ul 로, 한 줄에 하나씩 적는다. 한 li 는 두 문장을 넘기지 않는다.
+  - 중복 증거: 코드 조각이 여러 줄이면 .compare 블록(조각마다 figure+pre, 캡션에 파일:줄, 최장 공통 구간을 mark 로). 한 줄짜리 조각들은 pre 하나에 줄마다 # 주석으로 자리를 적는다. 두 조각을 공백으로 맞춘 2단 pre 는 쓰지 않는다 — 줄이 접히면 열이 어긋난다. 제안이 없는 항목(관찰)에는 details.why 가 없다.
+  - chip 종류: crit 크리티컬 · major 메이저 · minor 마이너 · dup 중복/미재사용 · arch 아키텍처 · obs 관찰 · how 확인 방법(재현됨 · 코드 대조 · git 대조 · 계약 검사) · kept 「이전 리뷰 유지」(재리뷰에서 새 head 에 그대로인 이전 항목) · decided 「결정으로 내림」(저자 답글·제품 결정으로 관찰로 내린 것. chip 뒤에 출처를 텍스트로 적는다) · 항목 ID(C1 · J1 · M1 · D1 · R1 · A1 · O1).
+  - 재리뷰면 header 의 sub 줄 끝에 "· 재리뷰 <이전 head 7자> → <새 head 7자>" 를 더하고, 8절의 「이전 항목 상태」 표를 채운다. 첫 리뷰면 그 h3 와 표를 지운다.
+  - 8절 「후보 처리표」는 항상 채운다. code-review·CodeRabbit·이전 리뷰 후보가 하나도 없었으면 "후보 없음" 한 행을 둔다.
+  - .compare 블록과 measure 줄은 scripts/dupcheck.py --html 의 출력을 그대로 붙인다.
+  - 판정 상자 class: 머지 가능 → verdict / 머지 전 수정 필요 → verdict fix / 구조 재검토 필요 → verdict structure.
+  - HTML 주석은 채운 뒤 전부 지운다. scripts/check-report.py 가 남은 주석을 실패로 잡는다.
+-->
+<main>
+<header>
+  <h1>PR #NNNN <주제> 리뷰</h1>
+  <p class="sub">&lt;owner/repo&gt; · base <code>BASE</code> &lt;base sha&gt; · head &lt;head sha&gt; · 리뷰 YYYY-MM-DD · 변경 N파일 +A −D (src n · tests m)<!-- 재리뷰면 " · 재리뷰 <이전 head 7자> → <새 head 7자>" --></p>
+</header>
+
+<section class="verdict" aria-label="판정">
+  <p class="big">판정: <!-- 머지 가능 | 머지 전 수정 필요 | 구조 재검토 필요 --></p>
+  <p><!-- 판정 한 줄: 크리티컬·메이저 n건, 마이너 n건, 중복 n건, 미재사용 n건 --></p>
+  <p><strong>중복·미재사용</strong> <!-- 요약 --></p>
+  <p><strong>아키텍처</strong> <!-- lint-imports 결과 · .importlinter 변경 여부 · 발견 --></p>
+  <p><strong>구조</strong> <!-- 원인 수. 근본 수정이 PR 범위를 넘는지 --></p>
+  <p><strong>안전 사실</strong> <!-- 한 문장 · 증명됨 n/5 (로그 prN-safety.log) | 미증명(사다리 n) --></p>
+  <p><strong>검증 방식</strong> 문제는 전부 PR head 에서 재현 테스트 또는 코드 대조로 확인했다.</p>
+</section>
+
+<section class="tiles" aria-label="카운트">
+  <div class="tile"><span class="n">0</span><span class="l">구조 원인</span></div>
+  <div class="tile"><span class="n">0</span><span class="l">크리티컬</span></div>
+  <div class="tile"><span class="n">0</span><span class="l">메이저</span></div>
+  <div class="tile"><span class="n">0</span><span class="l">중복·미재사용</span></div>
+  <div class="tile"><span class="n">0</span><span class="l">아키텍처</span></div>
+  <div class="tile"><span class="n">0</span><span class="l">기타 마이너</span></div>
+  <div class="tile"><span class="n ok">0/0</span><span class="l">재현 테스트</span></div>
+  <div class="tile"><span class="n ok">0</span><span class="l">기존 테스트 통과</span></div>
+</section>
+
+<section>
+  <h2>1. 구조 진단</h2>
+  <!-- 원인이 0개면 아래 한 줄만 남기고 figure 는 경로 지도 그림으로 쓴다 -->
+  <p>원인 없음. 결함은 전부 국소다.</p>
+  <figure>
+    <svg role="img" aria-label="<!-- 그림이 말하는 것 한 문장 -->" viewBox="0 0 940 300">
+      <defs><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker></defs>
+      <g font-family="IBM Plex Sans KR, system-ui, sans-serif" font-size="12" fill="currentColor">
+        <!-- 윗줄 "지금", 아랫줄 "제안". 상자 rect+text, 화살표 line marker-end="url(#arr)". 색은 currentColor 와 var 토큰 계열(#1f5f8b · #9a6700)만 -->
+      </g>
+    </svg>
+    <figcaption><!-- 그림 설명 한두 문장 --></figcaption>
+  </figure>
+  <!-- 원인이 있으면 원인마다 아래 블록을 둔다 -->
+  <div class="items">
+    <article class="item">
+      <div class="chips"><span class="chip cause">구조 원인</span><span class="chip how">재현됨</span><span class="chip">원인 A</span></div>
+      <h3><!-- 결정 한 문장 --></h3>
+      <div class="row"><span class="k">결함</span><span class="v"><!-- 이 결정으로 설명되는 확인된 결함 2건 이상. 항목 ID 와 확인 방법 --></span></div>
+      <div class="row"><span class="k">규칙</span><span class="v"><!-- 위반한 규칙 원문. 파일:줄 --></span></div>
+      <div class="row"><span class="k">대안 자리</span><span class="v"><!-- 레포에 이미 있는 대안 자리. 파일:줄 --></span></div>
+      <div class="two">
+        <div>
+          <h3>근본 수정</h3>
+          <p><!-- 무엇을 어디로 옮기는지, 바뀌는 시그니처·파일 수, PR 범위 안/밖, 지켜 주는 기존 테스트 --></p>
+          <details class="why"><summary>제안 근거</summary>
+            <div class="row"><span class="k">구간</span><span class="v"><!-- 4단계 지도의 구간. 파일:줄 --></span></div>
+            <div class="row"><span class="k">대안</span><span class="v"><ul>
+              <li><span class="pick">채택</span> <!-- 고른 길. 이유 한 문장 --></li>
+              <li><span class="drop">기각</span> <!-- 저울질한 다른 길. 기각 이유 한 문장. 대안마다 li 하나 --></li>
+            </ul></span></div>
+            <div class="row"><span class="k">근거</span><span class="v"><!-- 규칙 원문 또는 선례. 파일:줄 --></span></div>
+            <div class="row"><span class="k">적합성</span><span class="v"><ul>
+              <li><b>(a) 존재</b> <!-- 돌린 rg 명령과 결과 --></li>
+              <li><b>(b) 계층</b> <!-- 그 계층·단위에서 그 값을 읽어도 되는가 --></li>
+              <li><b>(c) 해소</b> <!-- 결함이 없어지는 이유 --></li>
+            </ul></span></div>
+            <div class="row"><span class="k">비용</span><span class="v"><!-- 바뀌는 파일 수·시그니처, PR 범위 안/밖 --></span></div>
+          </details>
+        </div>
+        <div>
+          <h3>증상 패치</h3>
+          <p><!-- 이 PR 안에서 결함만 없애는 길과 대가. 틀린 방향이면 "권하지 않음"과 이유 --></p>
+          <details class="why"><summary>제안 근거</summary>
+            <div class="row"><span class="k">구간</span><span class="v"><!-- 4단계 지도의 구간. 파일:줄 --></span></div>
+            <div class="row"><span class="k">대안</span><span class="v"><ul>
+              <li><span class="pick">채택</span> <!-- 고른 길. 이유 한 문장 --></li>
+              <li><span class="drop">기각</span> <!-- 저울질한 다른 길. 기각 이유 한 문장. 대안마다 li 하나 --></li>
+            </ul></span></div>
+            <div class="row"><span class="k">근거</span><span class="v"><!-- 규칙 원문 또는 선례. 파일:줄 --></span></div>
+            <div class="row"><span class="k">적합성</span><span class="v"><ul>
+              <li><b>(a) 존재</b> <!-- 돌린 rg 명령과 결과 --></li>
+              <li><b>(b) 계층</b> <!-- 그 계층·단위에서 그 값을 읽어도 되는가 --></li>
+              <li><b>(c) 해소</b> <!-- 결함이 없어지는 이유 --></li>
+            </ul></span></div>
+            <div class="row"><span class="k">비용</span><span class="v"><!-- 바뀌는 파일 수·시그니처, PR 범위 안/밖 --></span></div>
+          </details>
+        </div>
+      </div>
+    </article>
+  </div>
+</section>
+
+<section>
+  <h2>2. 크리티컬·메이저</h2>
+  <div class="items">
+    <article class="item">
+      <div class="chips"><span class="chip major">메이저</span><span class="chip how">재현됨</span><span class="chip">J1</span></div>
+      <h3><!-- 한 문장 결론 --></h3>
+      <div class="row"><span class="k">where</span><span class="v"><!-- 파일:줄 --></span></div>
+      <div class="row"><span class="k">재현</span><span class="v"><!-- 테스트 이름 + 관측값 --></span></div>
+      <div class="row"><span class="k">제안</span><span class="v"><!-- 규칙 11 로 확인한 제안 1개. 구조 원인에 속하면 "원인 A 참조" --></span></div>
+          <details class="why"><summary>제안 근거</summary>
+            <div class="row"><span class="k">구간</span><span class="v"><!-- 4단계 지도의 구간. 파일:줄 --></span></div>
+            <div class="row"><span class="k">대안</span><span class="v"><ul>
+              <li><span class="pick">채택</span> <!-- 고른 길. 이유 한 문장 --></li>
+              <li><span class="drop">기각</span> <!-- 저울질한 다른 길. 기각 이유 한 문장. 대안마다 li 하나 --></li>
+            </ul></span></div>
+            <div class="row"><span class="k">근거</span><span class="v"><!-- 규칙 원문 또는 선례. 파일:줄 --></span></div>
+            <div class="row"><span class="k">적합성</span><span class="v"><ul>
+              <li><b>(a) 존재</b> <!-- 돌린 rg 명령과 결과 --></li>
+              <li><b>(b) 계층</b> <!-- 그 계층·단위에서 그 값을 읽어도 되는가 --></li>
+              <li><b>(c) 해소</b> <!-- 결함이 없어지는 이유 --></li>
+            </ul></span></div>
+            <div class="row"><span class="k">비용</span><span class="v"><!-- 바뀌는 파일 수·시그니처, PR 범위 안/밖 --></span></div>
+          </details>
+    </article>
+  </div>
+</section>
+
+<section>
+  <h2>3. 중복·미재사용</h2>
+  <div class="items">
+    <article class="item">
+      <div class="chips"><span class="chip dup">중복</span><span class="chip how">코드 대조</span><span class="chip">D1</span></div>
+      <h3><!-- 한 문장 --></h3>
+      <div class="row"><span class="k">where</span><span class="v"><!-- 두 자리. 파일:줄 --></span></div>
+      <div class="row"><span class="k">증거</span><span class="v">
+        <div class="compare">
+          <figure><figcaption><code>파일:줄</code> <b>이름 A</b></figcaption><pre><code><!-- 코드 조각 1. 최장 공통 구간은 <mark>…</mark> 로 감싼다 --></code></pre></figure>
+          <figure><figcaption><code>파일:줄</code> <b>이름 B</b></figcaption><pre><code><!-- 코드 조각 2 --></code></pre></figure>
+        </div>
+        <p class="measure">difflib ratio 0.000 · 최장 공통 구간 N자(<mark>표시</mark>) · 공백 정규화 여부</p>
+      </span></div>
+      <div class="row"><span class="k">제안</span><span class="v"><!-- 제안 1개 --></span></div>
+          <details class="why"><summary>제안 근거</summary>
+            <div class="row"><span class="k">구간</span><span class="v"><!-- 4단계 지도의 구간. 파일:줄 --></span></div>
+            <div class="row"><span class="k">대안</span><span class="v"><ul>
+              <li><span class="pick">채택</span> <!-- 고른 길. 이유 한 문장 --></li>
+              <li><span class="drop">기각</span> <!-- 저울질한 다른 길. 기각 이유 한 문장. 대안마다 li 하나 --></li>
+            </ul></span></div>
+            <div class="row"><span class="k">근거</span><span class="v"><!-- 규칙 원문 또는 선례. 파일:줄 --></span></div>
+            <div class="row"><span class="k">적합성</span><span class="v"><ul>
+              <li><b>(a) 존재</b> <!-- 돌린 rg 명령과 결과 --></li>
+              <li><b>(b) 계층</b> <!-- 그 계층·단위에서 그 값을 읽어도 되는가 --></li>
+              <li><b>(c) 해소</b> <!-- 결함이 없어지는 이유 --></li>
+            </ul></span></div>
+            <div class="row"><span class="k">비용</span><span class="v"><!-- 바뀌는 파일 수·시그니처, PR 범위 안/밖 --></span></div>
+          </details>
+    </article>
+  </div>
+</section>
+
+<section>
+  <h2>4. 아키텍처 계약</h2>
+  <div class="tablewrap"><table>
+    <thead><tr><th>검사</th><th>결과</th></tr></thead>
+    <tbody>
+      <tr><td><code>uv run lint-imports</code></td><td class="ok">N kept · 0 broken</td></tr>
+      <tr><td><code>.importlinter</code> 변경 · <code>ignore_imports</code> 추가</td><td><!-- 없음 | 있음(파일:줄) --></td></tr>
+      <tr><td>judgment · agent_framework 어휘 유입</td><td><!-- 결과 --></td></tr>
+      <tr><td>새 포트 · 미들웨어 등록 순서</td><td><!-- 결과 --></td></tr>
+    </tbody>
+  </table></div>
+  <!-- 발견이 있으면 아래 items 를 쓴다. chip 은 arch -->
+  <p class="sub" style="margin-top:8px">발견 없음.</p>
+</section>
+
+<section>
+  <h2>5. 기타 마이너</h2>
+  <div class="items">
+    <article class="item">
+      <div class="chips"><span class="chip minor">마이너</span><span class="chip how">코드 대조</span><span class="chip">M1</span></div>
+      <h3><!-- 한 문장 --></h3>
+      <div class="row"><span class="k">where</span><span class="v"><!-- 파일:줄 --></span></div>
+      <div class="row"><span class="k">대조</span><span class="v"><!-- 재현이면 k 를 "재현"으로 --></span></div>
+      <div class="row"><span class="k">제안</span><span class="v"><!-- 제안 1개 --></span></div>
+          <details class="why"><summary>제안 근거</summary>
+            <div class="row"><span class="k">구간</span><span class="v"><!-- 4단계 지도의 구간. 파일:줄 --></span></div>
+            <div class="row"><span class="k">대안</span><span class="v"><ul>
+              <li><span class="pick">채택</span> <!-- 고른 길. 이유 한 문장 --></li>
+              <li><span class="drop">기각</span> <!-- 저울질한 다른 길. 기각 이유 한 문장. 대안마다 li 하나 --></li>
+            </ul></span></div>
+            <div class="row"><span class="k">근거</span><span class="v"><!-- 규칙 원문 또는 선례. 파일:줄 --></span></div>
+            <div class="row"><span class="k">적합성</span><span class="v"><ul>
+              <li><b>(a) 존재</b> <!-- 돌린 rg 명령과 결과 --></li>
+              <li><b>(b) 계층</b> <!-- 그 계층·단위에서 그 값을 읽어도 되는가 --></li>
+              <li><b>(c) 해소</b> <!-- 결함이 없어지는 이유 --></li>
+            </ul></span></div>
+            <div class="row"><span class="k">비용</span><span class="v"><!-- 바뀌는 파일 수·시그니처, PR 범위 안/밖 --></span></div>
+          </details>
+    </article>
+  </div>
+</section>
+
+<section>
+  <h2>6. 관찰 <span class="sub">(판정 수 제외)</span></h2>
+  <div class="items">
+    <article class="item">
+      <div class="chips"><span class="chip obs">관찰</span><span class="chip how">코드 대조</span><span class="chip">O1</span><!-- 결정으로 내린 항목이면 how 대신: <span class="chip decided">결정으로 내림</span> <span class="sub">출처: 코멘트 <id> 또는 YYYY-MM-DD 제품 결정</span> --></div>
+      <h3><!-- 한 문장 --></h3>
+      <div class="row"><span class="k">where</span><span class="v"><!-- 파일:줄 --></span></div>
+      <div class="row"><span class="k">판단</span><span class="v"><!-- 왜 결함으로 세지 않는지 --></span></div>
+    </article>
+  </div>
+</section>
+
+<section>
+  <h2>7. 재사용을 잘한 곳</h2>
+  <div class="tablewrap"><table>
+    <thead><tr><th>자리</th><th>무엇을 재사용했나</th></tr></thead>
+    <tbody>
+      <tr><td><code><!-- 파일:줄 --></code></td><td><!-- 재사용한 것 --></td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section>
+  <h2>8. 검증</h2>
+  <div class="tablewrap"><table>
+    <thead><tr><th>항목</th><th>결과</th></tr></thead>
+    <tbody>
+      <tr><td><code>uv run ruff check src tests</code> · <code>ruff format --check</code></td><td class="ok"><!-- 결과 --></td></tr>
+      <tr><td><code>uv run lint-imports</code></td><td class="ok"><!-- 결과 --></td></tr>
+      <tr><td><!-- suite --></td><td class="ok"><!-- N passed. 로그 prN-suite-<sub>.log --></td></tr>
+      <tr><td>기존 실패(base 동일)</td><td><!-- 없음 | n건 · 테스트 id · 로그 prN-base-fail.log. 판정 수 제외 --></td></tr>
+      <tr><td>안전 사실</td><td><!-- 한 문장 · 확신 n/5 · 로그 prN-safety.log | 미증명(사다리 n, 어디서 멈췄나) --></td></tr>
+      <tr><td>확인하고 해소한 위험</td><td><!-- 위험 한 줄 · 확인 방법 · 확신 n/5. 사다리 4 이상만. 줄마다 <br> --></td></tr>
+      <tr><td>PR 테스트 변이 실행</td><td><!-- 점검한 테스트 n개 · 변이에도 통과 m개(항목 ID) · 로그 prN-mutation-<label>.log | 없음 --></td></tr>
+      <tr><td>리뷰 재현 테스트 <code>test_zz_prN_review_repro*.py</code> · <code>zz_prN_review_repro*.test.tsx</code></td><td class="ok"><!-- 파일마다: 이름 · N passed(= N건 재현) · 로그 prN-repro-<label>.log --></td></tr>
+      <tr><td>CodeRabbit · 사람 리뷰</td><td><!-- 인라인 n건 · 리뷰 n건 --></td></tr>
+    </tbody>
+  </table></div>
+  <h3 class="t">후보 처리표</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>출처</th><th>후보</th><th>처리</th></tr></thead>
+    <tbody>
+      <tr><td><!-- code-review | CodeRabbit | 이전 리뷰 --></td><td><!-- 후보 한 줄 --></td><td><!-- 반영 → 항목 ID | 기각 — 이유 한 문장 | 관찰 → O n --></td></tr>
+    </tbody>
+  </table></div>
+  <!-- 재리뷰가 아니면 아래 h3 와 표를 지운다 -->
+  <h3 class="t">이전 항목 상태 (재리뷰)</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>ID</th><th>이전 분류</th><th>새 head 상태</th><th>확인 방법</th></tr></thead>
+    <tbody>
+      <tr><td><!-- M2 --></td><td><!-- 마이너 --></td><td><!-- 해소 | 잔존 | 결정으로 내림 --></td><td><!-- 재현 테스트 실패(결함 사라짐) | git 대조 <sha> | 이전 리뷰 유지 | 코멘트 <id> --></td></tr>
+    </tbody>
+  </table></div>
+  <p class="sub" style="margin-top:10px"><!-- PR 본문 정정 요청(있으면) --></p>
+</section>
+</main>
+</body>
+</html>

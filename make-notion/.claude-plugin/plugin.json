@@ -1,0 +1,8 @@
+{
+  "name": "make-notion",
+  "description": "git 브랜치 작업을 비개발자가 읽을 수 있는 설계 공유 문서로 정리해 노션 인덱스 페이지의 하위 페이지로 남기는 스킬 (make_notion). Notion·diagram-design 플러그인과 ego-browser 가 필요하다",
+  "author": {
+    "name": "sky629",
+    "url": "https://github.com/sky629"
+  }
+}

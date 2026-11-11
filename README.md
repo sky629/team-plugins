@@ -15,6 +15,8 @@ kang 이 쓰는 Claude Code 플러그인과 작업 규칙을 한곳에 모은 �
 | `context7` | MCP 서버 | 라이브러리·프레임워크의 최신 공식 문서를 조회하는 MCP 서버입니다. | 공식 마켓플레이스 `claude-plugins-official` (번들 의존성으로 설치) |
 | `compact-handoff` | 훅 | 자동 압축 직전에 세션 기록(최근 요청·고친 파일·git 상태)을 핸드오프 문서로 저장하고, 압축 뒤 컨텍스트에 넣은 다음 지우는 훅입니다. python3 가 필요합니다. | 이 레포 [`compact-handoff/`](compact-handoff/) |
 | `pstack` | 작업 절차 | 설계·구현·검증·리뷰를 서브에이전트로 병렬화하는 엄격한 워크플로 스킬 모음(`poteto-mode`, `how`, `why`, `arena` 등)입니다. 스킬이 호출하는 스크립트(sh·node)가 들어 있습니다. 설치 뒤 `/setup-pstack` 으로 역할별 모델을 정할 수 있습니다. | [cursor/plugins](https://github.com/cursor/plugins/tree/main/harness/pstack/claude-code) |
+| `make-notion` | 스킬 | git 브랜치에서 한 작업을 비개발자가 읽을 수 있는 설계 공유 문서로 정리해 노션 인덱스 페이지의 하위 페이지로 남기는 스킬(`make_notion`)입니다. 조사에는 pstack 의 `teach`·`how`·`why` 를 쓰고, 그림은 `diagram-design` 으로 그려 PNG 로 첨부합니다. Notion 플러그인과 [ego lite](https://github.com/citrolabs/ego-lite)(`ego-browser` CLI)가 필요합니다. | 이 레포 [`make-notion/`](make-notion/) |
+| `review-pr` | 스킬 | GitHub PR 하나를 5축(크리티컬·중복·미재사용·아키텍처·구조 진단)으로 검토하는 스킬입니다. 재현한 문제만 HTML 보고서와 코멘트 초안으로 내고, 게시는 승인 뒤에 합니다. 레포마다 다른 명령은 `.claude/review-pr.md` 프로필에서 읽습니다. `gh`·`git`·`python3` 가 필요합니다. | 이 레포 [`review-pr/`](review-pr/) |
 
 스킬 플러그인 4개(`andrej-karpathy-skills`, `diagram-design`, `eli5`, `pstack`)는 업스트림 레포를 그대로 참조합니다. 이 레포에는 복사본이 없습니다. `andrej-karpathy-skills` 와 `eli5` 는 마크다운만 있습니다. `diagram-design` 과 `pstack` 은 스킬이 실행하는 스크립트를 포함하므로, 업데이트하면 그 스크립트도 새 버전으로 바뀝니다. kang 이 같은 조건으로 쓰고 있어서 커밋을 고정하지 않기로 했습니다.
 
@@ -80,11 +82,23 @@ claude plugin disable kang-setup@team-plugins && claude plugin disable kang-rule
 claude plugin disable kang-setup@team-plugins && claude plugin disable compact-handoff@team-plugins
 ```
 
+## make-notion 과 review-pr
+
+두 스킬은 `kang-setup` 번들에 들어 있지 않습니다. 필요한 사람이 따로 설치합니다.
+
+```
+/plugin install make-notion@team-plugins
+/plugin install review-pr@team-plugins
+```
+
+- `make-notion`: 노션 인덱스 페이지(예: "<이름> Task 현황")의 이름이나 URL 을 처음 한 번 알려 주면 됩니다. Notion 플러그인(`notion@claude-plugins-official`)과 `diagram-design` 은 필수이고, `pstack` 이 있으면 조사 단계에 씁니다.
+- `review-pr`: 리뷰할 레포의 체크아웃에서 실행합니다. 레포에 `.claude/review-pr.md`(서브트리별 테스트 러너·검증 명령·규칙 문서 목록)가 있으면 그것을 쓰고, 없으면 CI 워크플로와 규칙 문서에서 찾아 씁니다. `pstack` 과 Codex CLI 가 있으면 적대 리뷰 후보를 더 모읍니다.
+
 ## 업데이트
 
 - **수동**: `/plugin marketplace update team-plugins` 를 실행한 뒤 `claude plugin update <이름>@team-plugins` 를 실행하고, `/reload-plugins` 로 적용합니다. 번들에 새 플러그인이 추가됐으면 `claude plugin update kang-setup@team-plugins` 뒤 `/reload-plugins` 가 새 의존성을 설치합니다.
 - **자동**: `/plugin` → Marketplaces → team-plugins → Enable auto-update 를 켭니다. 기본값은 꺼짐입니다.
-- **버전 규칙**: `kang-setup`, `kang-rules`, `compact-handoff` 는 이 레포의 커밋이 곧 새 버전입니다. 스킬 플러그인 4개는 업스트림이 `version` 을 올릴 때 따라갑니다.
+- **버전 규칙**: `kang-setup`, `kang-rules`, `compact-handoff`, `make-notion`, `review-pr` 는 이 레포의 커밋이 곧 새 버전입니다. 스킬 플러그인 4개는 업스트림이 `version` 을 올릴 때 따라갑니다.
 - **번들 제거**: `claude plugin uninstall kang-setup@team-plugins` 를 실행해도 의존성 플러그인은 남습니다. 의존성까지 전부 지우려면 `claude plugin prune` 을 실행합니다. 이 명령은 자동 설치된 플러그인 8개(superpowers, context7, pstack, compact-handoff 포함)를 모두 지우므로, `--dry-run` 으로 먼저 확인합니다.
 
 ## 이미 설치한 사람
