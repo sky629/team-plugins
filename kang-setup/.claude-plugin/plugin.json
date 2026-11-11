@@ -1,6 +1,6 @@
 {
   "name": "kang-setup",
-  "description": "kang 구성 전체: andrej-karpathy-skills, diagram-design, eli5, pstack, superpowers, context7, kang-rules, compact-handoff",
+  "description": "kang 구성 전체: andrej-karpathy-skills, diagram-design, eli5, pstack, make-notion, review-pr, superpowers, context7, kang-rules, compact-handoff",
   "author": { "name": "sky629", "url": "https://github.com/sky629" },
   "dependencies": [
     "kang-rules",
@@ -9,6 +9,8 @@
     "diagram-design",
     "eli5",
     "pstack",
+    "make-notion",
+    "review-pr",
     "superpowers@claude-plugins-official",
     "context7@claude-plugins-official"
   ]

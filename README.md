@@ -84,7 +84,7 @@ claude plugin disable kang-setup@team-plugins && claude plugin disable compact-h
 
 ## make-notion 과 review-pr
 
-두 스킬은 `kang-setup` 번들에 들어 있지 않습니다. 필요한 사람이 따로 설치합니다.
+두 스킬은 `kang-setup` 번들에 들어 있습니다. 번들 없이 따로 설치할 수도 있습니다.
 
 ```
 /plugin install make-notion@team-plugins
@@ -99,7 +99,7 @@ claude plugin disable kang-setup@team-plugins && claude plugin disable compact-h
 - **수동**: `/plugin marketplace update team-plugins` 를 실행한 뒤 `claude plugin update <이름>@team-plugins` 를 실행하고, `/reload-plugins` 로 적용합니다. 번들에 새 플러그인이 추가됐으면 `claude plugin update kang-setup@team-plugins` 뒤 `/reload-plugins` 가 새 의존성을 설치합니다.
 - **자동**: `/plugin` → Marketplaces → team-plugins → Enable auto-update 를 켭니다. 기본값은 꺼짐입니다.
 - **버전 규칙**: `kang-setup`, `kang-rules`, `compact-handoff`, `make-notion`, `review-pr` 는 이 레포의 커밋이 곧 새 버전입니다. 스킬 플러그인 4개는 업스트림이 `version` 을 올릴 때 따라갑니다.
-- **번들 제거**: `claude plugin uninstall kang-setup@team-plugins` 를 실행해도 의존성 플러그인은 남습니다. 의존성까지 전부 지우려면 `claude plugin prune` 을 실행합니다. 이 명령은 자동 설치된 플러그인 8개(superpowers, context7, pstack, compact-handoff 포함)를 모두 지우므로, `--dry-run` 으로 먼저 확인합니다.
+- **번들 제거**: `claude plugin uninstall kang-setup@team-plugins` 를 실행해도 의존성 플러그인은 남습니다. 의존성까지 전부 지우려면 `claude plugin prune` 을 실행합니다. 이 명령은 자동 설치된 플러그인 10개(superpowers, context7, pstack, compact-handoff 포함)를 모두 지우므로, `--dry-run` 으로 먼저 확인합니다.
 
 ## 이미 설치한 사람
 
