@@ -7,8 +7,7 @@ kang 이 쓰는 Claude Code 플러그인과 작업 규칙을 한곳에 모은 �
 | 이름 | 종류 | 설명 | 출처 |
 |---|---|---|---|
 | `kang-setup` | 번들 | 아래 플러그인 전부를 한 번에 설치합니다. 자체 기능은 없습니다. | 이 레포 |
-| `kang-rules` | 작업 규칙 | kang 의 전역 CLAUDE.md(답변 규율, 문제 해결 원칙, 한국어 작성 지침)를 매 세션 컨텍스트에 넣는 훅입니다. | 이 레포 [`kang-rules/rules/`](kang-rules/rules/) |
-| `andrej-karpathy-skills` | 스킬 | LLM 코딩 실수를 줄이는 행동 지침 스킬(`karpathy-guidelines`)입니다. | [forrestchang/andrej-karpathy-skills](https://github.com/forrestchang/andrej-karpathy-skills) |
+| `kang-rules` | 작업 규칙 | kang 의 전역 CLAUDE.md(코딩 지침, 문제 해결 원칙, 답변 규율, 한국어 작성 지침)를 매 세션 컨텍스트에 넣는 훅입니다. 코딩 지침은 [forrestchang/andrej-karpathy-skills](https://github.com/forrestchang/andrej-karpathy-skills)(MIT)의 지침을 고쳐 넣은 것입니다([`NOTICE.md`](kang-rules/NOTICE.md)). | 이 레포 [`kang-rules/rules/`](kang-rules/rules/) |
 | `diagram-design` | 스킬 | 브랜드를 적용한 아키텍처·흐름도·차트 다이어그램을 HTML/SVG/PNG 로 만드는 스킬입니다. 스킬이 호출하는 스크립트(node·python) 60여 개가 들어 있습니다. | [cathrynlavery/diagram-design](https://github.com/cathrynlavery/diagram-design) |
 | `eli5` | 스킬 | 주제를 다섯 살에게 설명하듯 그림 설명서로 풀어 주는 스킬입니다. | [anthropics/claude-plugins-community](https://github.com/anthropics/claude-plugins-community/tree/main/eli5) |
 | `superpowers` | 작업 절차 | 브레인스토밍, 계획, TDD, 코드 리뷰 등 개발 절차 스킬 모음입니다. | 공식 마켓플레이스 `claude-plugins-official` (번들 의존성으로 설치) |
@@ -19,7 +18,7 @@ kang 이 쓰는 Claude Code 플러그인과 작업 규칙을 한곳에 모은 �
 | `make-notion` | 스킬 | git 브랜치에서 한 작업을 비개발자가 읽을 수 있는 설계 공유 문서로 정리해 노션 인덱스 페이지의 하위 페이지로 남기는 스킬(`make_notion`)입니다. 조사에는 pstack 의 `teach`·`how`·`why` 를 쓰고, 그림은 `diagram-design` 으로 그려 PNG 로 첨부합니다. Notion 플러그인과 [ego lite](https://github.com/citrolabs/ego-lite)(`ego-browser` CLI)가 필요합니다. | 이 레포 [`make-notion/`](make-notion/) |
 | `review-pr` | 스킬 | GitHub PR 하나를 5축(크리티컬·중복·미재사용·아키텍처·구조 진단)으로 검토하는 스킬입니다. 재현한 문제만 HTML 보고서와 코멘트 초안으로 내고, 게시는 승인 뒤에 합니다. 레포마다 다른 명령은 `.claude/review-pr.md` 프로필에서 읽습니다. `gh`·`git`·`python3` 가 필요합니다. | 이 레포 [`review-pr/`](review-pr/) |
 
-스킬 플러그인 4개(`andrej-karpathy-skills`, `diagram-design`, `eli5`, `pstack`)는 업스트림 레포를 그대로 참조합니다. 이 레포에는 복사본이 없습니다. `andrej-karpathy-skills` 와 `eli5` 는 마크다운만 있습니다. `diagram-design` 과 `pstack` 은 스킬이 실행하는 스크립트를 포함하므로, 업데이트하면 그 스크립트도 새 버전으로 바뀝니다. kang 이 같은 조건으로 쓰고 있어서 커밋을 고정하지 않기로 했습니다.
+스킬 플러그인 3개(`diagram-design`, `eli5`, `pstack`)는 업스트림 레포를 그대로 참조합니다. 이 레포에는 복사본이 없습니다. `eli5` 는 마크다운만 있습니다. `diagram-design` 과 `pstack` 은 스킬이 실행하는 스크립트를 포함하므로, 업데이트하면 그 스크립트도 새 버전으로 바뀝니다. kang 이 같은 조건으로 쓰고 있어서 커밋을 고정하지 않기로 했습니다.
 
 ## 전체 설치
 
@@ -99,12 +98,12 @@ claude plugin disable kang-setup@team-plugins && claude plugin disable compact-h
 
 - **수동**: `/plugin marketplace update team-plugins` 를 실행한 뒤 `claude plugin update <이름>@team-plugins` 를 실행하고, `/reload-plugins` 로 적용합니다. 번들에 새 플러그인이 추가됐으면 `claude plugin update kang-setup@team-plugins` 뒤 `/reload-plugins` 가 새 의존성을 설치합니다.
 - **자동**: `/plugin` → Marketplaces → team-plugins → Enable auto-update 를 켭니다. 기본값은 꺼짐입니다.
-- **버전 규칙**: `kang-setup`, `kang-rules`, `compact-handoff`, `make-notion`, `review-pr` 는 이 레포의 커밋이 곧 새 버전입니다. 스킬 플러그인 4개는 업스트림이 `version` 을 올릴 때 따라갑니다.
+- **버전 규칙**: `kang-setup`, `kang-rules`, `compact-handoff`, `make-notion`, `review-pr` 는 이 레포의 커밋이 곧 새 버전입니다. 스킬 플러그인 3개는 업스트림이 `version` 을 올릴 때 따라갑니다.
 - **번들 제거**: `claude plugin uninstall kang-setup@team-plugins` 를 실행해도 의존성 플러그인은 남습니다. 의존성까지 전부 지우려면 `claude plugin prune` 을 실행합니다. 이 명령은 자동 설치된 플러그인 11개(superpowers, context7, notion, pstack, compact-handoff 포함)를 모두 지우므로, `--dry-run` 으로 먼저 확인합니다.
 
 ## 이미 설치한 사람
 
-다른 마켓플레이스(`karpathy-skills`, `diagram-design`, `claude-community`, `cursor-plugins`)에서 같은 플러그인을 이미 설치했어도 그대로 두고 설치해도 됩니다. 두 개가 나란히 켜지고 스킬이 목록에 두 번 보일 뿐, 오류는 없습니다(실측: 두 플러그인의 스킬이 모두 로드되고 충돌 없음). 하나만 두고 싶으면 옛것을 지웁니다.
+다른 마켓플레이스(`diagram-design`, `claude-community`, `cursor-plugins`)에서 같은 플러그인을 이미 설치했어도 그대로 두고 설치해도 됩니다. 두 개가 나란히 켜지고 스킬이 목록에 두 번 보일 뿐, 오류는 없습니다(실측: 두 플러그인의 스킬이 모두 로드되고 충돌 없음). 하나만 두고 싶으면 옛것을 지웁니다.
 
 ```sh
 claude plugin uninstall diagram-design@diagram-design

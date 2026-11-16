@@ -7,13 +7,13 @@
     {
       "name": "kang-setup",
       "source": "./kang-setup",
-      "description": "kang 구성 전체(스킬 5 + pstack + superpowers + context7 + notion + kang-rules + compact-handoff)를 한 번에 설치하는 번들",
+      "description": "kang 구성 전체(스킬 4 + pstack + superpowers + context7 + notion + kang-rules + compact-handoff)를 한 번에 설치하는 번들",
       "category": "bundle"
     },
     {
       "name": "kang-rules",
       "source": "./kang-rules",
-      "description": "kang 의 전역 CLAUDE.md(답변 규율, 문제 해결 원칙, 한국어 작성 지침)를 매 세션 컨텍스트에 넣는 훅",
+      "description": "kang 의 전역 CLAUDE.md(코딩 지침, 문제 해결 원칙, 답변 규율, 한국어 작성 지침)를 매 세션 컨텍스트에 넣는 훅",
       "category": "rules"
     },
     {
@@ -21,15 +21,6 @@
       "source": "./compact-handoff",
       "description": "자동 압축 직전에 세션 기록을 핸드오프 문서로 저장하고, 압축 뒤 컨텍스트에 넣은 다음 지우는 훅",
       "category": "hook"
-    },
-    {
-      "name": "andrej-karpathy-skills",
-      "source": {
-        "source": "url",
-        "url": "https://github.com/forrestchang/andrej-karpathy-skills.git"
-      },
-      "description": "LLM 코딩 실수를 줄이는 행동 지침 스킬 (karpathy-guidelines)",
-      "category": "skill"
     },
     {
       "name": "diagram-design",
