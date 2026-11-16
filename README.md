@@ -7,7 +7,7 @@ kang 이 쓰는 Claude Code 플러그인과 작업 규칙을 한곳에 모은 �
 | 이름 | 종류 | 설명 | 출처 |
 |---|---|---|---|
 | `kang-setup` | 번들 | 아래 플러그인 전부를 한 번에 설치합니다. 자체 기능은 없습니다. | 이 레포 |
-| `kang-rules` | 작업 규칙 | kang 의 전역 CLAUDE.md(코딩 지침, 문제 해결 원칙, 답변 규율, 한국어 작성 지침)를 매 세션 컨텍스트에 넣는 훅입니다. 코딩 지침은 [forrestchang/andrej-karpathy-skills](https://github.com/forrestchang/andrej-karpathy-skills)(MIT)의 지침을 고쳐 넣은 것입니다([`NOTICE.md`](kang-rules/NOTICE.md)). | 이 레포 [`kang-rules/rules/`](kang-rules/rules/) |
+| `kang-rules` | 작업 규칙 | kang 의 전역 CLAUDE.md(코딩 지침, 문제 해결 원칙, 작업 규칙, 답변 규율, 한국어 작성 지침)를 매 세션 컨텍스트에 넣는 훅입니다. 코딩 지침은 [forrestchang/andrej-karpathy-skills](https://github.com/forrestchang/andrej-karpathy-skills)(MIT)의 지침을 고쳐 넣은 것입니다([`NOTICE.md`](kang-rules/NOTICE.md)). | 이 레포 [`kang-rules/rules/`](kang-rules/rules/) |
 | `diagram-design` | 스킬 | 브랜드를 적용한 아키텍처·흐름도·차트 다이어그램을 HTML/SVG/PNG 로 만드는 스킬입니다. 스킬이 호출하는 스크립트(node·python) 60여 개가 들어 있습니다. | [cathrynlavery/diagram-design](https://github.com/cathrynlavery/diagram-design) |
 | `eli5` | 스킬 | 주제를 다섯 살에게 설명하듯 그림 설명서로 풀어 주는 스킬입니다. | [anthropics/claude-plugins-community](https://github.com/anthropics/claude-plugins-community/tree/main/eli5) |
 | `superpowers` | 작업 절차 | 브레인스토밍, 계획, TDD, 코드 리뷰 등 개발 절차 스킬 모음입니다. | 공식 마켓플레이스 `claude-plugins-official` (번들 의존성으로 설치) |

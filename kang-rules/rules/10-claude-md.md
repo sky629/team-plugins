@@ -2,7 +2,7 @@
 ## Coding guidelines
 Apply these guidelines to every coding task (writing, editing, refactoring, or debugging code).
 
-Behavioral guidelines to reduce common LLM coding mistakes, derived from [Andrej Karpathy's observations](https://x.com/karpathy/status/2015883857489522876) on LLM coding pitfalls. Adapted from [forrestchang/andrej-karpathy-skills](https://github.com/forrestchang/andrej-karpathy-skills) (MIT License); section 3 is changed to agree with "Problem solving" below.
+Adapted from [forrestchang/andrej-karpathy-skills](https://github.com/forrestchang/andrej-karpathy-skills) (MIT License).
 
 **Tradeoff:** These guidelines bias toward caution over speed. For trivial tasks, use judgment.
 
@@ -11,10 +11,10 @@ Behavioral guidelines to reduce common LLM coding mistakes, derived from [Andrej
 **Don't assume. Don't hide confusion. Surface tradeoffs.**
 
 Before implementing:
-- State your assumptions explicitly. If uncertain, ask.
-- If multiple interpretations exist, present them - don't pick silently.
+- State your assumptions explicitly.
+- If multiple interpretations exist and the choice is hard to reverse or changes the scope, present them and ask. Otherwise pick one, state it, and continue.
 - If a simpler approach exists, say so. Push back when warranted.
-- If something is unclear, stop. Name what's confusing. Ask.
+- Stop and ask only when you cannot continue without the answer. Name what is unclear.
 
 ### 2. Simplicity First
 
@@ -34,13 +34,12 @@ Ask yourself: "Would a senior engineer say this is overcomplicated?" If yes, sim
 
 When editing existing code:
 - Don't "improve" adjacent code, comments, or formatting.
-- Don't refactor things that aren't broken. A root-cause fix is not such a refactor: prefer it even when it touches more code.
+- Don't refactor things that aren't broken. A root-cause fix is not such a refactor.
 - Match existing style, even if you'd do it differently.
 - If you notice dead code that is unrelated to the change, mention it - don't delete it.
 
 When your changes create orphans:
 - Remove imports/variables/functions that YOUR changes made unused.
-- When a design changes, remove the fields, functions, tests, and docstrings of the earlier design in the same change.
 - Don't remove pre-existing dead code that is unrelated to the change unless asked.
 
 The test: Every changed line should trace directly to the user's request, to its root cause, or to the design it replaces.
@@ -61,6 +60,8 @@ For multi-step tasks, state a brief plan:
 3. [Step] → verify: [check]
 ```
 
+When the project's CLAUDE.md defines a test-first procedure, follow it. Otherwise write the test first when a cheap local test target exists or the user asks for it, and verify with the project's existing checks in other cases.
+
 Strong success criteria let you loop independently. Weak criteria ("make it work") require constant clarification.
 
 ## Problem solving
@@ -68,7 +69,14 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
 - Do not overfit to the case at hand. A prompt sentence, regex, or branch that enumerates the specific example or type is a patch for that example only. Fix the class of cases, not the example.
 - Prefer the root-cause fix even when it touches more code. Present a symptom patch only alongside the fundamental fix, and say which is which.
 
-When these rules conflict with the coding guidelines above, these rules win.
+## Working rules
+- Do not commit, push, or merge to a shared branch (main, develop, or an environment branch) unless the user tells you to. Work on a task branch.
+- Create a pull request only after the user approves it. "Push" does not mean "create a PR".
+- For writes outside the repository (Notion, GitHub issues and comments, published pages), prepare a draft and wait for approval.
+- Use ego-browser for all browser work. Do not use Playwright MCP or claude-in-chrome.
+- Write code comments for the current design only. Do not put dates, ticket or trace IDs, environment names, or design history in them.
+- Use the superpowers brainstorming and writing-plans skills only for new features and design changes. Skip them for bug fixes with a known cause, documentation, and configuration changes.
+- Save superpowers specs and plans outside the repository (default `~/Documents/dev/superpowers/`). Do not commit them.
 
 ## Answer style
 Write answers with the structural rules of ASD-STE100 (Simplified Technical English). Keep the answer language; apply these rules in any language:
@@ -85,8 +93,6 @@ Sentence length is not a target. Never shorten a sentence by dropping particles,
 For Korean, KOREAN.md governs the sentence and word level; this section governs structure. When they conflict, KOREAN.md wins at the sentence level.
 
 ## Visual output
-Use images, diagrams, and HTML output actively. Do not limit answers to text and tables.
 - When a structure, flow, comparison, or data set is easier to understand as a picture, make a diagram or chart.
-- When an answer is long or has many parts (report, design, review), deliver it as an HTML document.
-- Use the diagram, chart, and artifact skills when they are available.
+- Deliver a report, design, or review as an HTML document when it has more than three tables or figures, or when the user asks for a document. Otherwise answer in text.
 - Keep the main conclusion in the text answer, and give the path or URL of each output file.
