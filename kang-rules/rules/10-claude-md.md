@@ -2,8 +2,6 @@
 ## Coding guidelines
 Apply these guidelines to every coding task (writing, editing, refactoring, or debugging code).
 
-Adapted from [forrestchang/andrej-karpathy-skills](https://github.com/forrestchang/andrej-karpathy-skills) (MIT License).
-
 **Tradeoff:** These guidelines bias toward caution over speed. For trivial tasks, use judgment.
 
 ### 1. Think Before Coding
