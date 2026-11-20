@@ -49,8 +49,12 @@ try:
         backup = path + ".bak-compact-handoff"
         if not os.path.exists(backup):
             shutil.copy2(path, backup)
+    # settings.json 에는 토큰 같은 값이 들어 있을 수 있다. 기존 파일의 권한을 그대로 쓰고, 새 파일은 소유자만 읽고 쓰게 만든다.
+    mode = os.stat(path).st_mode & 0o777 if os.path.exists(path) else 0o600
     tmp = path + ".tmp-compact-handoff"
-    with open(tmp, "w", encoding="utf-8") as fh:
+    fd = os.open(tmp, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, mode)
+    os.fchmod(fd, mode)
+    with os.fdopen(fd, "w", encoding="utf-8") as fh:
         json.dump(data, fh, ensure_ascii=False, indent=2)
         fh.write("\n")
     os.replace(tmp, path)
