@@ -115,6 +115,7 @@ li{margin:2px 0}
 <section class="verdict" aria-label="판정">
   <p class="big">판정: <!-- 머지 가능 | 머지 전 수정 필요 | 구조 재검토 필요 --></p>
   <p><!-- 판정 한 줄: 크리티컬·메이저 n건, 마이너 n건, 중복 n건, 미재사용 n건 --></p>
+  <p><strong>결정 필요</strong> <!-- Q 수와 질문 요약. 수정 전에 답이 먼저 필요하다 | 없음 --></p>
   <p><strong>중복·미재사용</strong> <!-- 요약 --></p>
   <p><strong>아키텍처</strong> <!-- lint-imports 결과 · .importlinter 변경 여부 · 발견 --></p>
   <p><strong>구조</strong> <!-- 원인 수. 근본 수정이 PR 범위를 넘는지 --></p>
@@ -123,6 +124,7 @@ li{margin:2px 0}
 </section>
 
 <section class="tiles" aria-label="카운트">
+  <div class="tile"><span class="n">0</span><span class="l">결정 필요</span></div>
   <div class="tile"><span class="n">0</span><span class="l">구조 원인</span></div>
   <div class="tile"><span class="n">0</span><span class="l">크리티컬</span></div>
   <div class="tile"><span class="n">0</span><span class="l">메이저</span></div>
@@ -131,6 +133,33 @@ li{margin:2px 0}
   <div class="tile"><span class="n">0</span><span class="l">기타 마이너</span></div>
   <div class="tile"><span class="n ok">0/0</span><span class="l">재현 테스트</span></div>
   <div class="tile"><span class="n ok">0</span><span class="l">기존 테스트 통과</span></div>
+</section>
+
+<section>
+  <h2>0. 결정 필요 <span class="sub">(수정 전에 먼저 정한다 · 판정 수 제외)</span></h2>
+  <!-- 없으면 아래 한 줄만 남기고 items 를 지운다 -->
+  <p>없음.</p>
+  <!-- 재리뷰에서 회귀 사슬이 있으면 이 표를 둔다. 없으면 지운다 -->
+  <div class="tablewrap"><table>
+    <thead><tr><th>이전 항목</th><th>고친 커밋</th><th>새 항목</th><th>밑에 있는 결정</th></tr></thead>
+    <tbody>
+      <tr><td><!-- J2 --></td><td><code><!-- sha 9자 --></code></td><td><!-- J4 --></td><td><!-- Q1 --></td></tr>
+    </tbody>
+  </table></div>
+  <div class="items">
+    <article class="item">
+      <div class="chips"><span class="chip cause">결정 필요</span><span class="chip">Q1</span><span class="sub"><!-- 결정자: 저자 | 제품 | 인프라 --></span></div>
+      <h3><!-- 질문 한 문장. "무엇을 우선하는가" 꼴 --></h3>
+      <div class="tablewrap"><table>
+        <thead><tr><th>선택지</th><th>얻는 것</th><th>잃는 것</th><th>남는 항목</th></tr></thead>
+        <tbody>
+          <tr><td><!-- A · 현재 --></td><td><!-- 확인한 사실만 --></td><td><!-- 확인한 사실만. 파일:줄 또는 재현 테스트 --></td><td><!-- 결함 ID | 없음 --></td></tr>
+        </tbody>
+      </table></div>
+      <div class="row"><span class="k">묶인 항목</span><span class="v"><!-- 이 결정 뒤에 고칠 결함 ID --></span></div>
+      <div class="row"><span class="k">의견</span><span class="v"><!-- 리뷰어 의견 한 줄과 근거 | 의견 없음. 결정자가 고른다 --></span></div>
+    </article>
+  </div>
 </section>
 
 <section>
