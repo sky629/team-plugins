@@ -73,8 +73,8 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
 - For writes outside the repository (Notion, GitHub issues and comments, published pages), prepare a draft and wait for approval.
 - Use ego-browser for all browser work. Do not use Playwright MCP or claude-in-chrome.
 - Write code comments for the current design only. Do not put dates, ticket or trace IDs, environment names, or design history in them.
-- Use the superpowers brainstorming and writing-plans skills only for new features and design changes. Skip them for bug fixes with a known cause, documentation, and configuration changes.
-- Save superpowers specs and plans outside the repository (default `~/Documents/dev/superpowers/`). Do not commit them.
+- Use the pstack design and planning skills (`architect`, `arena`, `figure-it-out`, the Multi-phase plan playbook) only for new features and design changes. Skip them for bug fixes with a known cause, documentation, and configuration changes.
+- Save specs and plans outside the repository (default `~/Documents/dev/design-docs/`). Do not commit them.
 
 ## Answer style
 Write answers with the structural rules of ASD-STE100 (Simplified Technical English). Keep the answer language; apply these rules in any language:
