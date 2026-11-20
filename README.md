@@ -16,6 +16,7 @@ kang 이 쓰는 Claude Code 플러그인과 작업 규칙을 한곳에 모은 �
 | `pstack` | 작업 절차 | 설계·구현·검증·리뷰를 서브에이전트로 병렬화하는 엄격한 워크플로 스킬 모음(`poteto-mode`, `how`, `why`, `arena` 등)입니다. 스킬이 호출하는 스크립트(sh·node)가 들어 있습니다. 설치 뒤 `/setup-pstack` 으로 역할별 모델을 정할 수 있습니다. | [cursor/plugins](https://github.com/cursor/plugins/tree/main/harness/pstack/claude-code) |
 | `make-notion` | 스킬 | git 브랜치에서 한 작업을 비개발자가 읽을 수 있는 설계 공유 문서로 정리해 노션 인덱스 페이지의 하위 페이지로 남기는 스킬(`make_notion`)입니다. 조사에는 pstack 의 `teach`·`how`·`why` 를 쓰고, 그림은 `diagram-design` 으로 그려 PNG 로 첨부합니다. Notion 플러그인과 [ego lite](https://github.com/citrolabs/ego-lite)(`ego-browser` CLI)가 필요합니다. | 이 레포 [`make-notion/`](make-notion/) |
 | `review-pr` | 스킬 | GitHub PR 하나를 5축(크리티컬·중복·미재사용·아키텍처·구조 진단)으로 검토하는 스킬입니다. 재현한 문제만 HTML 보고서와 코멘트 초안으로 내고, 게시는 승인 뒤에 합니다. 레포마다 다른 명령은 `.claude/review-pr.md` 프로필에서 읽습니다. `gh`·`git`·`python3` 가 필요합니다. | 이 레포 [`review-pr/`](review-pr/) |
+| `spec-flow` | 스킬 | 새 기능을 구현하기 전후에 쓰는 스킬 두 개입니다. `make_spec` 은 사용자가 원하는 것과 이유를 대화로 확인해 스펙을 쓰고 승인받습니다. `run_final_check` 는 구현 뒤에 드래프트 PR 을 만들고, 서브에이전트로 자기 리뷰를 돌려 고친 뒤, 승인을 받아 게시하고 Ready 로 바꿉니다. 둘 다 수동 호출이고 `pstack` 과 함께 씁니다. `make_spec` 의 대화 절차는 [obra/superpowers](https://github.com/obra/superpowers)(MIT)의 `brainstorming` 을 고쳐 옮긴 것입니다([`NOTICE.md`](spec-flow/NOTICE.md)). | 이 레포 [`spec-flow/`](spec-flow/) |
 
 스킬 플러그인 3개(`diagram-design`, `eli5`, `pstack`)는 업스트림 레포를 그대로 참조합니다. 이 레포에는 복사본이 없습니다. `eli5` 는 마크다운만 있습니다. `diagram-design` 과 `pstack` 은 스킬이 실행하는 스크립트를 포함하므로, 업데이트하면 그 스크립트도 새 버전으로 바뀝니다. kang 이 같은 조건으로 쓰고 있어서 커밋을 고정하지 않기로 했습니다.
 
@@ -93,11 +94,27 @@ claude plugin disable kang-setup@team-plugins && claude plugin disable compact-h
 - `make-notion`: 노션 인덱스 페이지(예: "<이름> Task 현황")의 이름이나 URL 을 처음 한 번 알려 주면 됩니다. Notion 플러그인(`notion@claude-plugins-official`)과 `diagram-design` 은 필수이며 번들로 설치하면 함께 설치됩니다. 따로 설치할 때는 두 플러그인을 직접 설치합니다. `pstack` 이 있으면 조사 단계에 씁니다.
 - `review-pr`: 리뷰할 레포의 체크아웃에서 실행합니다. 레포에 `.claude/review-pr.md`(서브트리별 테스트 러너·검증 명령·규칙 문서 목록)가 있으면 그것을 쓰고, 없으면 CI 워크플로와 규칙 문서에서 찾아 씁니다. `pstack` 과 Codex CLI 가 있으면 적대 리뷰 후보를 더 모읍니다.
 
+## spec-flow: 큰 기능을 만드는 순서
+
+`pstack` 은 코드 구조를 정하고 검증하는 일을 맡지만 사용자에게 묻지 않도록 설계되어 있습니다. `spec-flow` 는 그 앞과 뒤를 맡습니다.
+
+```
+/make_spec <만들 기능>      이유와 제품 결정을 대화로 확인 → 스펙 승인 → 인계 문장 출력
+/poteto-mode <인계 문장>    구조 설계 경합 → 설계와 계획 승인 → 구현 → 검증
+run_final_check             드래프트 PR → 서브에이전트 리뷰 → 수정 → 게시 승인 → Ready
+```
+
+- `make_spec`: 프로젝트가 답하는 것은 묻지 않고 읽어서 확인합니다. 질문은 한 번에 하나씩 하고, 접근 방식은 동작 수준에서 두세 개를 제시합니다. 타입과 모듈 경계는 정하지 않고 `pstack` 의 `architect` 에 넘깁니다. 스펙은 사용자의 규칙이 정한 경로에 쓰고, 정한 경로가 없으면 묻습니다.
+- 인계 문장: `make_spec` 이 승인 뒤에 출력합니다. 스펙의 결정을 바꾸지 않는다, 구현 전에 설계와 계획을 승인받는다, 끝나면 결정마다 지켰는지 표로 보고한다, 그 뒤 `run_final_check` 를 따른다는 줄이 들어 있습니다. 사용자가 `/poteto-mode` 에 직접 붙여 넣습니다.
+- `run_final_check`: `/run_final_check` 로 따로 부를 수도 있습니다. PR 본문은 프로젝트의 PR 스킬로 쓰고, 리뷰는 프로젝트의 리뷰 스킬(`review-pr` 등)을 새 서브에이전트가 돌립니다. 승인 전에 하는 외부 쓰기는 작업 브랜치 푸시와 드래프트 PR 생성(리뷰어와 멘션 없음)뿐입니다. 여러 PR 로 나눈 작업은 PR 을 하나씩 처리합니다.
+
+두 스킬은 `disable-model-invocation` 으로 설정되어 있어서 자동으로 실행되지 않습니다.
+
 ## 업데이트
 
 - **수동**: `/plugin marketplace update team-plugins` 를 실행한 뒤 `claude plugin update <이름>@team-plugins` 를 실행하고, `/reload-plugins` 로 적용합니다. 번들에 새 플러그인이 추가됐으면 `claude plugin update kang-setup@team-plugins` 뒤 `/reload-plugins` 가 새 의존성을 설치합니다.
 - **자동**: `/plugin` → Marketplaces → team-plugins → Enable auto-update 를 켭니다. 기본값은 꺼짐입니다.
-- **버전 규칙**: `kang-setup`, `kang-rules`, `compact-handoff`, `make-notion`, `review-pr` 는 이 레포의 커밋이 곧 새 버전입니다. 스킬 플러그인 3개는 업스트림이 `version` 을 올릴 때 따라갑니다.
+- **버전 규칙**: `kang-setup`, `kang-rules`, `compact-handoff`, `make-notion`, `review-pr`, `spec-flow` 는 이 레포의 커밋이 곧 새 버전입니다. 스킬 플러그인 3개는 업스트림이 `version` 을 올릴 때 따라갑니다.
 - **번들 제거**: `claude plugin uninstall kang-setup@team-plugins` 를 실행해도 의존성 플러그인은 남습니다. 의존성까지 전부 지우려면 `claude plugin prune` 을 실행합니다. 이 명령은 자동 설치된 플러그인(context7, notion, pstack, compact-handoff 포함)을 모두 지우므로, `--dry-run` 으로 먼저 확인합니다.
 
 ## 이미 설치한 사람

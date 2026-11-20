@@ -1,0 +1,8 @@
+{
+  "name": "spec-flow",
+  "description": "새 기능을 대화로 확인해 스펙으로 쓰고(make_spec), 구현 뒤 드래프트 PR · 자기 리뷰 · 수정 · 게시 승인까지 잇는(run_final_check) 스킬 두 개. pstack 과 함께 쓴다. 두 스킬 모두 수동 호출이다",
+  "author": {
+    "name": "sky629",
+    "url": "https://github.com/sky629"
+  }
+}
