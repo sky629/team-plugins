@@ -19,7 +19,7 @@
     {
       "name": "compact-handoff",
       "source": "./compact-handoff",
-      "description": "자동 압축 직전에 세션 기록을 핸드오프 문서로 저장하고, 압축 뒤 컨텍스트에 넣은 다음 지우는 훅",
+      "description": "자동 압축 직전에 세션 기록을 핸드오프 문서로 저장하고, 압축 뒤 컨텍스트에 넣은 다음 지우는 훅. 자동 압축 임계값이 없으면 60% 로 설정한다",
       "category": "hook"
     },
     {

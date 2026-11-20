@@ -61,20 +61,33 @@ claude plugin disable kang-setup@team-plugins && claude plugin disable kang-rule
 
 번들은 자체 기능이 없어서 꺼도 잃는 것이 없고, 나머지 플러그인은 그대로 켜져 있습니다. 다시 켜려면 `claude plugin enable kang-rules@team-plugins` 를 실행합니다.
 
-## compact-handoff 가 하는 일과 70% 임계값
+## compact-handoff 가 하는 일과 60% 임계값
 
 자동 압축 요약은 최근 요청과 고친 파일을 빠뜨리기 쉽습니다. `compact-handoff` 는 그 사실을 트랜스크립트에서 기계적으로 뽑아 보완합니다.
 
 1. 압축 직전(`PreCompact`)에 [`handoff-write.sh`](compact-handoff/scripts/handoff-write.sh) 가 `~/.claude/handoff/<session_id>.md` 를 씁니다. 작업 디렉터리와 git 상태, 최근 사용자 요청 12개, 최근 Bash 작업 설명 10개, 이 세션에서 고친 파일 목록, 마지막 답변 앞부분이 들어갑니다. 7일 지난 핸드오프 파일은 이때 지웁니다.
 2. 압축 뒤 세션이 다시 시작될 때(`SessionStart`, matcher `compact`) [`handoff-read.sh`](compact-handoff/scripts/handoff-read.sh) 가 그 문서를 `<handoff>` 블록으로 컨텍스트에 넣고 파일을 지웁니다. 문서가 없으면 아무것도 하지 않습니다.
 
-두 스크립트는 bash 와 python3 를 씁니다. 압축 없이 끝난 세션의 문서는 다음 압축 때 7일 기준으로 정리됩니다.
+스크립트는 bash 와 python3 를 씁니다. 압축 없이 끝난 세션의 문서는 다음 압축 때 7일 기준으로 정리됩니다.
 
-압축 임계값은 플러그인이 바꿀 수 없습니다. 70% 에서 압축되게 하려면 `~/.claude/settings.json` 의 `env` 에 다음 값을 넣습니다. 환경 변수이므로 새로 시작하는 세션부터 적용됩니다.
+### 압축 임계값 60% (설정이 필요합니다)
+
+이 플러그인은 컨텍스트 사용량이 60% 에 닿았을 때 압축되는 것을 전제로 합니다. Claude Code 의 기본 임계값은 이보다 높아서, 임계값을 낮추지 않으면 압축이 늦게 일어나고 핸드오프 문서도 그만큼 늦게 만들어집니다. 임계값은 `~/.claude/settings.json` 의 `env` 에 있는 다음 값으로 정합니다.
 
 ```json
-{ "env": { "CLAUDE_AUTOCOMPACT_PCT_OVERRIDE": "70" } }
+{ "env": { "CLAUDE_AUTOCOMPACT_PCT_OVERRIDE": "60" } }
 ```
+
+**값이 없으면 플러그인이 자동으로 넣습니다.** 세션이 시작될 때 [`ensure-threshold.sh`](compact-handoff/scripts/ensure-threshold.sh) 가 다음 순서로 동작합니다.
+
+1. `CLAUDE_AUTOCOMPACT_PCT_OVERRIDE` 가 이미 정해져 있으면 아무것도 하지 않습니다. 사용자가 정한 값(예: `"70"`)을 덮어쓰지 않습니다.
+2. 값이 없으면 `~/.claude/settings.json` 을 `settings.json.bak-compact-handoff` 로 한 번 백업하고, `env` 에 `"60"` 을 넣습니다. 다른 설정은 그대로 둡니다.
+3. 넣었다는 메시지를 화면에 보여 줍니다.
+4. `settings.json` 을 읽을 수 없으면 파일을 건드리지 않고, 직접 넣으라는 메시지를 보여 줍니다.
+
+환경 변수는 세션이 시작될 때 읽히므로 **넣은 값은 다음 세션부터 적용됩니다.** 설치한 뒤 세션을 한 번 다시 시작해야 60% 로 동작합니다. 적용되었는지는 새 세션에서 `echo $CLAUDE_AUTOCOMPACT_PCT_OVERRIDE` 로 확인합니다.
+
+다른 임계값을 쓰려면 `settings.json` 의 값을 고칩니다. 자동 설정을 원하지 않으면 플러그인을 켜기 전에 원하는 값을 먼저 넣어 둡니다.
 
 `compact-handoff` 도 `kang-setup` 의 의존성이라서 혼자 끌 수 없습니다. 끄려면 `kang-rules` 와 같은 방법으로 번들과 함께 끕니다.
 
