@@ -91,6 +91,8 @@ Sentence length is not a target. Never shorten a sentence by dropping particles,
 For Korean, KOREAN.md governs the sentence and word level; this section governs structure. When they conflict, KOREAN.md wins at the sentence level.
 
 ## Visual output
-- When a structure, flow, comparison, or data set is easier to understand as a picture, make a diagram or chart.
+- Draw a diagram when the answer explains one of these: a flow of three or more steps, a structure of three or more components, or a cause-and-effect chain. A table is not a substitute for a diagram.
+- Make the diagram with the `diagram-design` skill, save it under `~/.diagram-design/out/`, and give the file path. Use a mermaid code block only when the user asks for it.
+- This section applies in every output style, including Concise.
 - Deliver a report, design, or review as an HTML document when it has more than three tables or figures, or when the user asks for a document. Otherwise answer in text.
 - Keep the main conclusion in the text answer, and give the path or URL of each output file.
